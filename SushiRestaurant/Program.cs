@@ -1,112 +1,98 @@
 namespace SushiRestaurant;
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 public class Program
 {
     public static void Main(string[] args)
     {
-        Console.WriteLine("--- Testing Employee Classes (Multi-Aspect Inheritance) ---");
+        var loaded = Persistence.LoadAll();
+        Console.WriteLine(loaded
+            ? "Loaded existing data from sushi.json."
+            : "No file found or load failed. Starting with empty extents.");
 
-        // 1. Create a Full-Time Manager (Inherits Manager, Implements IFullTimeAspect)
-        var ftManager = new FullTimeManager
+        PrintCounts("After initial load");
+
+        if (!loaded)
         {
-            FirstName = "Alice",
-            LastName = "Smith",
-            BaseSalary = 75000m,
-            SeniorityLevel = SeniorityLevel.Senior, // Enum
-            VacationDays = 25,                      // FullTime Aspect
-            IsOnSickLeave = false,                  // FullTime Aspect
-            Address = new Address
+           
+            var g1 = new Guest("Charlie", "Brown", "Chuck");
+            var g2 = new Guest("Lucy", "Van Pelt");
+
+            var res = new Reservation(DateTime.Now.AddDays(7).Date.AddHours(19), 4, 120.50m)
             {
-                StreetName = "Main St",
-                StreetNumber = "101",
-                CityName = "Metropolis"
-            }
-        };
+                IsPaid = true,
+                ReviewScore = 5
+            };
 
-        Console.WriteLine($"\n**Employee 1: {ftManager.FirstName} {ftManager.LastName} ({ftManager.SeniorityLevel} Manager)**");
-        Console.WriteLine($"Base Salary: {ftManager.BaseSalary:C}");
-        Console.WriteLine($"Derived Salary: {ftManager.Salary:C} (Base * 1.5 for Senior)");
-        Console.WriteLine($"Vacation Days (FT): {ftManager.VacationDays}");
-        Console.WriteLine($"Lives at: {ftManager.Address.StreetName} {ftManager.Address.StreetNumber}");
+            var addr = new Address("Main St", "101", "00-001", "Metropolis");
+            var ftMgr = new FullTimeManager("Alice", "Smith", addr, "PL00112233", "555-111-222", 75000m,
+                                            SeniorityLevel.Senior, vacationDays: 25, isOnSickLeave: false);
 
-        Console.WriteLine("-----------------------------------------------------------------");
+            var ptWaiter = new PartTimeWaiter("Bob", "Johnson", addr, "PL99887766", "555-333-444", 15000m,
+                                              hoursInContract: 20.5, tips: 5000m);
+            ptWaiter.AddLanguage("English");
+            ptWaiter.AddLanguage("Spanish");
 
-        // 2. Create a Part-Time Waiter (Inherits Waiter, Implements IPartTimeAspect)
-        var ptWaiter = new PartTimeWaiter
-        {
-            FirstName = "Bob",
-            LastName = "Johnson",
-            BaseSalary = 15000m,
-            Tips = 5000m,
-            HoursInContract = 20.5, // PartTime Aspect
-        };
-        ptWaiter.SpokenLanguages.AddRange(new List<string> { "English", "Spanish" }); // Multi-Value Attribute
+            var ftCook = new FullTimeCook("Mina", "Tanaka", addr, "PL11223344", "555-777-888", 42000m,
+                                          bonus: 3000m, specialization: "Sushi", vacationDays: 12);
 
-        Console.WriteLine($"\n**Employee 2: {ptWaiter.FirstName} {ptWaiter.LastName} (Part-Time Waiter)**");
-        Console.WriteLine($"Base Salary: {ptWaiter.BaseSalary:C}");
-        Console.WriteLine($"Tips: {ptWaiter.Tips:C}");
-        Console.WriteLine($"Derived Salary: {ptWaiter.Salary:C} (Base + Tips)");
-        Console.WriteLine($"Contract Hours (PT): {ptWaiter.HoursInContract}");
-        Console.WriteLine($"Languages: {string.Join(", ", ptWaiter.SpokenLanguages)}");
+            var ptCleaner = new PartTimeCleaner("John", "Doe", addr, "PL55667788", "555-000-111", 22000m,
+                                                cleaningShift: "Evening", assignedArea: "Dining Hall",
+                                                hoursInContract: 15);
 
-        Console.WriteLine("-----------------------------------------------------------------");
+            PrintCounts("After creating sample data");
 
-        Console.WriteLine("\n--- Testing Guest and Reservation Classes ---");
-
-        // 3. Create a Guest
-        var guest = new Guest
-        {
-            FirstName = "Charlie",
-            LastName = "Brown",
-            Nickname = "Chuck" // Nullable property used
-        };
-        Console.WriteLine($"\n**Guest: {guest.FirstName} (Nickname: {guest.Nickname})**");
-        
-        // 4. Create a Reservation (Testing Derived Attributes and Constraints)
-        var reservation = new Reservation
-        {
-            StartDateTime = DateTime.Now.AddDays(7).Date.AddHours(19),
-            TotalCost = 120.50m,
-            IsPaid = true,
-            Comment = null, // Nullable property unused
-        };
-        
-        try
-        {
-            // Set constrained attribute (valid value)
-            reservation.NumberOfGuests = 4; // Must be 1 to 10
-            
-            // Set nullable constrained attribute (valid value)
-            reservation.ReviewScore = 5; // Must be 0 to 5
-            
-            Console.WriteLine($"\n**Reservation Details**");
-            Console.WriteLine($"Start Time: {reservation.StartDateTime:g}");
-            Console.WriteLine($"Derived End Time (Static +{Reservation.DurationHours}h): {reservation.EndDateTime:g}");
-            Console.WriteLine($"Guests: {reservation.NumberOfGuests}");
-            Console.WriteLine($"Score: {reservation.ReviewScore}/5");
-            Console.WriteLine($"Bonus Points (Default=0): {reservation.BonusPoints}");
-
+            Persistence.SaveAll();
+            Console.WriteLine("Saved to sushi.json.");
         }
-        catch (ArgumentOutOfRangeException ex)
+
+        ClearAllExtents();
+        PrintCounts("After manual clear (simulate fresh app)");
+
+        var reloaded = Persistence.LoadAll();
+        Console.WriteLine(reloaded ? "Reloaded from sushi.json." : "Reload failed.");
+        PrintCounts("After reload");
+
+        var guest = Guest.FindByName("Charlie", "Brown");
+        Console.WriteLine(guest != null
+            ? $"Found guest after reload: {guest}"
+            : "Guest 'Charlie Brown' not found after reload.");
+
+        var anyRes = Reservation.Extent.FirstOrDefault();
+        if (anyRes != null)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine($"Reservation: starts {anyRes.StartDateTime:g}, ends {anyRes.EndDateTime:g}, guests {anyRes.NumberOfGuests}, paid={anyRes.IsPaid}");
         }
-        
-        // 5. Test constraint violation (too many guests)
-        try
-        {
-            Console.WriteLine("\n--- Testing Constraint Violation (Guests > 10) ---");
-            var invalidReservation = new Reservation();
-            invalidReservation.NumberOfGuests = 12; // This should throw an exception
-        }
-        catch (ArgumentOutOfRangeException ex)
-        {
-            Console.WriteLine($"Caught expected exception: {ex.Message.Split('\n')[0]}");
-        }
+    }
+
+    private static void PrintCounts(string label)
+    {
+        Console.WriteLine($"\n-- {label} --");
+        Console.WriteLine($"Guests: {Guest.Extent.Count}");
+        Console.WriteLine($"Reservations: {Reservation.Extent.Count}");
+        Console.WriteLine($"FT Waiters: {FullTimeWaiter.Extent.Count} | PT Waiters: {PartTimeWaiter.Extent.Count}");
+        Console.WriteLine($"FT Managers: {FullTimeManager.Extent.Count} | PT Managers: {PartTimeManager.Extent.Count}");
+        Console.WriteLine($"FT Cooks: {FullTimeCook.Extent.Count} | PT Cooks: {PartTimeCook.Extent.Count}");
+        Console.WriteLine($"FT Cleaners: {FullTimeCleaner.Extent.Count} | PT Cleaners: {PartTimeCleaner.Extent.Count}");
+    }
+
+    private static void ClearAllExtents()
+    {
+        Guest.ClearExtent();
+        Reservation.ClearExtent();
+
+        FullTimeWaiter.ClearExtent();
+        PartTimeWaiter.ClearExtent();
+
+        FullTimeManager.ClearExtent();
+        PartTimeManager.ClearExtent();
+
+        FullTimeCook.ClearExtent();
+        PartTimeCook.ClearExtent();
+
+        FullTimeCleaner.ClearExtent();
+        PartTimeCleaner.ClearExtent();
     }
 }

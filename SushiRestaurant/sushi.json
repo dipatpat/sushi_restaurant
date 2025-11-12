@@ -1,0 +1,117 @@
+{
+  "Guests": [
+    {
+      "Nickname": "Chuck",
+      "FirstName": "Charlie",
+      "LastName": "Brown"
+    },
+    {
+      "Nickname": null,
+      "FirstName": "Lucy",
+      "LastName": "Van Pelt"
+    }
+  ],
+  "Reservations": [
+    {
+      "StartDateTime": "2025-11-19T19:00:00+01:00",
+      "TotalCost": 120.50,
+      "ReviewScore": 5,
+      "Comment": null,
+      "NumberOfGuests": 4,
+      "IsPaid": true,
+      "BonusPoints": 0
+    }
+  ],
+  "FullTimeWaiters": [],
+  "PartTimeWaiters": [
+    {
+      "HoursInContract": 20.5,
+      "SpokenLanguages": [
+        "English",
+        "Spanish"
+      ],
+      "Tips": 5000,
+      "Address": {
+        "StreetName": "Main St",
+        "StreetNumber": "101",
+        "PostalCode": "00-001",
+        "CityName": "Metropolis",
+        "ApartmentNumber": null,
+        "DoorNumber": null
+      },
+      "BankAccount": "PL99887766",
+      "PhoneNumber": "555-333-444",
+      "BaseSalary": 15000,
+      "IsFullTime": false,
+      "FirstName": "Bob",
+      "LastName": "Johnson"
+    }
+  ],
+  "FullTimeManagers": [
+    {
+      "VacationDays": 25,
+      "IsOnSickLeave": false,
+      "SeniorityLevel": 1,
+      "Address": {
+        "StreetName": "Main St",
+        "StreetNumber": "101",
+        "PostalCode": "00-001",
+        "CityName": "Metropolis",
+        "ApartmentNumber": null,
+        "DoorNumber": null
+      },
+      "BankAccount": "PL00112233",
+      "PhoneNumber": "555-111-222",
+      "BaseSalary": 75000,
+      "IsFullTime": true,
+      "FirstName": "Alice",
+      "LastName": "Smith"
+    }
+  ],
+  "PartTimeManagers": [],
+  "FullTimeCooks": [
+    {
+      "VacationDays": 12,
+      "IsOnSickLeave": false,
+      "Bonus": 3000,
+      "Specialization": "Sushi",
+      "Address": {
+        "StreetName": "Main St",
+        "StreetNumber": "101",
+        "PostalCode": "00-001",
+        "CityName": "Metropolis",
+        "ApartmentNumber": null,
+        "DoorNumber": null
+      },
+      "BankAccount": "PL11223344",
+      "PhoneNumber": "555-777-888",
+      "BaseSalary": 42000,
+      "IsFullTime": true,
+      "FirstName": "Mina",
+      "LastName": "Tanaka"
+    }
+  ],
+  "PartTimeCooks": [],
+  "FullTimeCleaners": [],
+  "PartTimeCleaners": [
+    {
+      "HoursInContract": 15,
+      "CleaningShift": "Evening",
+      "AssignedArea": "Dining Hall",
+      "Address": {
+        "StreetName": "Main St",
+        "StreetNumber": "101",
+        "PostalCode": "00-001",
+        "CityName": "Metropolis",
+        "ApartmentNumber": null,
+        "DoorNumber": null
+      },
+      "BankAccount": "PL55667788",
+      "PhoneNumber": "555-000-111",
+      "BaseSalary": 22000,
+      "IsFullTime": false,
+      "FirstName": "John",
+      "LastName": "Doe"
+    }
+  ]
+}
