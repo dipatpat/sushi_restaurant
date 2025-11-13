@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-using System.Linq;
 using System.Text.Json;
 
 namespace SushiRestaurant;
@@ -16,11 +13,9 @@ public static class Persistence
     {
         var dto = new SushiDto
         {
-            // Core
             Guests       = Guest.Extent.ToList(),
             Reservations = Reservation.Extent.ToList(),
 
-            // Employees – concrete variants
             FullTimeWaiters  = FullTimeWaiter.Extent.ToList(),
             PartTimeWaiters  = PartTimeWaiter.Extent.ToList(),
             FullTimeManagers = FullTimeManager.Extent.ToList(),
