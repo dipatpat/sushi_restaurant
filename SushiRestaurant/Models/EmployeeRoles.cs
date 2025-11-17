@@ -32,12 +32,12 @@ public class Waiter : Employee
     [JsonIgnore] 
     public override decimal Salary => BaseSalary + Tips;
 
-    protected Waiter(string firstName, string lastName, Address address,
+    public Waiter(string firstName, string lastName, Address address,
         string bankAccount, string phoneNumber, decimal baseSalary, bool isFullTime)
         : base(firstName, lastName, address, bankAccount, phoneNumber, baseSalary, isFullTime)
     { }
 
-    protected Waiter() { } 
+    public Waiter() { } 
 }
 
 public enum SeniorityLevel
@@ -54,7 +54,7 @@ public class Manager : Employee
     [JsonIgnore] 
     public override decimal Salary => BaseSalary * (SeniorityLevel == SeniorityLevel.Senior ? 1.5m : 1.2m);
 
-    protected Manager(string firstName, string lastName, Address address,
+    public Manager(string firstName, string lastName, Address address,
         string bankAccount, string phoneNumber, decimal baseSalary, bool isFullTime,
         SeniorityLevel seniority = SeniorityLevel.Junior)
         : base(firstName, lastName, address, bankAccount, phoneNumber, baseSalary, isFullTime)
@@ -62,7 +62,7 @@ public class Manager : Employee
         SeniorityLevel = seniority;
     }
 
-    protected Manager() { } 
+    public Manager() { } 
 }
 
 public class Cook : Employee
@@ -93,7 +93,7 @@ public class Cook : Employee
     [JsonIgnore] 
     public override decimal Salary => BaseSalary + Bonus;
 
-    protected Cook(string firstName, string lastName, Address address,
+    public Cook(string firstName, string lastName, Address address,
         string bankAccount, string phoneNumber, decimal baseSalary, bool isFullTime,
         decimal bonus = 0m, string? specialization = null)
         : base(firstName, lastName, address, bankAccount, phoneNumber, baseSalary, isFullTime)
@@ -102,7 +102,7 @@ public class Cook : Employee
         Specialization = specialization;
     }
 
-    protected Cook() { } 
+    public Cook() { } 
 }
 
 
@@ -133,7 +133,7 @@ public class Cleaner : Employee
     [JsonIgnore] 
     public override decimal Salary => BaseSalary;
 
-    protected Cleaner(string firstName, string lastName, Address address,
+    public Cleaner(string firstName, string lastName, Address address,
         string bankAccount, string phoneNumber, decimal baseSalary, bool isFullTime,
         string cleaningShift, string assignedArea)
         : base(firstName, lastName, address, bankAccount, phoneNumber, baseSalary, isFullTime)
@@ -142,5 +142,5 @@ public class Cleaner : Employee
         AssignedArea = assignedArea;
     }
 
-    protected Cleaner() { } 
+    public Cleaner() { } 
 }
