@@ -19,8 +19,8 @@ public class FullTimeWaiter : Waiter, IFullTimeAspect
         int vacationDays, bool isOnSickLeave = false, decimal tips = 0m)
         : base(firstName, lastName, address, bankAccount, phoneNumber, baseSalary, true)
     {
-        if (vacationDays < 0) throw new ArgumentOutOfRangeException(nameof(vacationDays));
-        if (tips < 0) throw new ArgumentOutOfRangeException(nameof(tips));
+        if (vacationDays < 0) throw new ArgumentOutOfRangeException(nameof(vacationDays), "Vacation days cannot be negative.");
+        if (tips < 0) throw new ArgumentOutOfRangeException(nameof(tips), "Tips cannot be negative.");
 
         VacationDays = vacationDays;
         IsOnSickLeave = isOnSickLeave;
@@ -52,7 +52,7 @@ public class FullTimeManager : Manager, IFullTimeAspect
         SeniorityLevel seniority, int vacationDays, bool isOnSickLeave = false)
         : base(firstName, lastName, address, bankAccount, phoneNumber, baseSalary, true, seniority)
     {
-        if (vacationDays < 0) throw new ArgumentOutOfRangeException(nameof(vacationDays));
+        if (vacationDays < 0) throw new ArgumentOutOfRangeException(nameof(vacationDays), "Vacation days cannot be negative.");
         VacationDays = vacationDays;
         IsOnSickLeave = isOnSickLeave;
 
@@ -81,7 +81,7 @@ public class FullTimeCook : Cook, IFullTimeAspect
         int vacationDays = 0, bool isOnSickLeave = false)
         : base(firstName, lastName, address, bankAccount, phoneNumber, baseSalary, true, bonus, specialization)
     {
-        if (vacationDays < 0) throw new ArgumentOutOfRangeException(nameof(vacationDays));
+        if (vacationDays < 0) throw new ArgumentOutOfRangeException(nameof(vacationDays), "Vacation days cannot be negative.");
         VacationDays = vacationDays;
         IsOnSickLeave = isOnSickLeave;
 
@@ -112,7 +112,7 @@ public class FullTimeCleaner : Cleaner, IFullTimeAspect
         int vacationDays = 0, bool isOnSickLeave = false)
         : base(firstName, lastName, address, bankAccount, phoneNumber, baseSalary, true, cleaningShift, assignedArea)
     {
-        if (vacationDays < 0) throw new ArgumentOutOfRangeException(nameof(vacationDays));
+        if (vacationDays < 0) throw new ArgumentOutOfRangeException(nameof(vacationDays), "Vacation days cannot be negative.");
         VacationDays = vacationDays;
         IsOnSickLeave = isOnSickLeave;
 
@@ -139,7 +139,7 @@ public class PartTimeWaiter : Waiter, IPartTimeAspect
         get => _hoursInContract;
         set
         {
-            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(HoursInContract));
+            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(HoursInContract), "Hours in contract must be positive.");
             _hoursInContract = value;
         }
     }
@@ -149,8 +149,9 @@ public class PartTimeWaiter : Waiter, IPartTimeAspect
         double hoursInContract, decimal tips = 0m)
         : base(firstName, lastName, address, bankAccount, phoneNumber, baseSalary, false)
     {
+        if (hoursInContract <= 0) throw new ArgumentOutOfRangeException(nameof(hoursInContract), "Hours in contract must be positive.");
         HoursInContract = hoursInContract;
-        if (tips < 0) throw new ArgumentOutOfRangeException(nameof(tips));
+        if (tips < 0) throw new ArgumentOutOfRangeException(nameof(tips), "Tips cannot be negative.");
         Tips = tips;
 
         _extent.Add(this);
@@ -176,7 +177,7 @@ public class PartTimeManager : Manager, IPartTimeAspect
         get => _hoursInContract;
         set
         {
-            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(HoursInContract));
+            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(HoursInContract), "Hours in contract must be positive.");
             _hoursInContract = value;
         }
     }
@@ -186,6 +187,7 @@ public class PartTimeManager : Manager, IPartTimeAspect
         SeniorityLevel seniority, double hoursInContract)
         : base(firstName, lastName, address, bankAccount, phoneNumber, baseSalary, false, seniority)
     {
+        if (hoursInContract <= 0) throw new ArgumentOutOfRangeException(nameof(hoursInContract), "Hours in contract must be positive.");
         HoursInContract = hoursInContract;
         _extent.Add(this);
     }
@@ -211,7 +213,7 @@ public class PartTimeCook : Cook, IPartTimeAspect
         get => _hoursInContract;
         set
         {
-            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(HoursInContract));
+            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(HoursInContract), "Hours in contract must be positive.");
             _hoursInContract = value;
         }
     }
@@ -221,6 +223,8 @@ public class PartTimeCook : Cook, IPartTimeAspect
         double hoursInContract, decimal bonus = 0m, string? specialization = null)
         : base(firstName, lastName, address, bankAccount, phoneNumber, baseSalary, false, bonus, specialization)
     {
+        if (hoursInContract <= 0) throw new ArgumentOutOfRangeException(nameof(hoursInContract), "Hours in contract must be positive.");
+        if (bonus < 0) throw new ArgumentOutOfRangeException(nameof(bonus), "Bonus cannot be negative.");
         HoursInContract = hoursInContract;
         _extent.Add(this);
     }
@@ -245,7 +249,7 @@ public class PartTimeCleaner : Cleaner, IPartTimeAspect
         get => _hoursInContract;
         set
         {
-            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(HoursInContract));
+            if (value <= 0) throw new ArgumentOutOfRangeException(nameof(HoursInContract), "Hours in contract must be positive.");
             _hoursInContract = value;
         }
     }
@@ -256,6 +260,7 @@ public class PartTimeCleaner : Cleaner, IPartTimeAspect
         double hoursInContract)
         : base(firstName, lastName, address, bankAccount, phoneNumber, baseSalary, false, cleaningShift, assignedArea)
     {
+        if (hoursInContract <= 0) throw new ArgumentOutOfRangeException(nameof(hoursInContract), "Hours in contract must be positive.");
         HoursInContract = hoursInContract;
         _extent.Add(this);
     }

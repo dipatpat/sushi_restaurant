@@ -15,7 +15,7 @@ public class Reservation
             _extent.AddRange(items);
     }
 
-    public const int DurationHours = 3;
+    public static int DurationHours = 3;
 
     private DateTime _startDateTime;
     public DateTime StartDateTime
