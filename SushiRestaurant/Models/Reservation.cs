@@ -25,6 +25,9 @@ public class Reservation
         {
             if (value == default)
                 throw new ArgumentException("StartDateTime is required.", nameof(StartDateTime));
+
+            if (value < DateTime.Now)
+                throw new ArgumentOutOfRangeException(nameof(StartDateTime), "Start date and time must be in the future.");
             
             _startDateTime = value;
         }
