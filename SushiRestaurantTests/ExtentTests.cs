@@ -1,0 +1,132 @@
+using SushiRestaurant;
+
+
+namespace sushi_restaurant_tests
+{
+    [TestFixture]
+    public class ExtentTests
+    {
+        private static Address CreateTestAddress() =>
+            new Address("Main St", "10A", "00-001", "Metropolis");
+
+        private static void ClearAllExtents()
+        {
+            Guest.ClearExtent();
+            Reservation.ClearExtent();
+
+            FullTimeWaiter.ClearExtent();
+            PartTimeWaiter.ClearExtent();
+
+            FullTimeManager.ClearExtent();
+            PartTimeManager.ClearExtent();
+
+            FullTimeCook.ClearExtent();
+            PartTimeCook.ClearExtent();
+
+            FullTimeCleaner.ClearExtent();
+            PartTimeCleaner.ClearExtent();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            ClearAllExtents();
+        }
+
+        [Test]
+        public void CreatingObjects_AddsThemToCorrectExtents()
+        {
+            var addr = CreateTestAddress();
+
+            var guest = new Guest("Charlie", "Brown");
+            var reservation = new Reservation(DateTime.Today.AddHours(19), 4, 120m);
+
+            var ftManager = new FullTimeManager("Alice", "Smith", addr, "PL001", "555-111-222",
+                                                7500m, SeniorityLevel.Senior, vacationDays: 25);
+
+            var ptWaiter = new PartTimeWaiter("Bob", "Johnson", addr, "PL002", "555-333-444",
+                                              3000m, hoursInContract: 20.5, tips: 500m);
+
+            var ftCook = new FullTimeCook("Mina", "Tanaka", addr, "PL003", "555-777-888",
+                                          4200m, bonus: 300m, specialization: "Sushi");
+
+            var ptCleaner = new PartTimeCleaner("John", "Doe", addr, "PL004", "555-000-111",
+                                                2200m, "Evening", "Dining Hall", hoursInContract: 15);
+
+            Assert.That(Guest.Extent, Has.Count.EqualTo(1));
+            Assert.That(Guest.Extent[0], Is.SameAs(guest));
+
+            Assert.That(Reservation.Extent, Has.Count.EqualTo(1));
+            Assert.That(Reservation.Extent[0], Is.SameAs(reservation));
+
+            Assert.That(FullTimeManager.Extent, Has.Count.EqualTo(1));
+            Assert.That(FullTimeManager.Extent[0], Is.SameAs(ftManager));
+
+            Assert.That(PartTimeWaiter.Extent, Has.Count.EqualTo(1));
+            Assert.That(PartTimeWaiter.Extent[0], Is.SameAs(ptWaiter));
+
+            Assert.That(FullTimeCook.Extent, Has.Count.EqualTo(1));
+            Assert.That(FullTimeCook.Extent[0], Is.SameAs(ftCook));
+
+            Assert.That(PartTimeCleaner.Extent, Has.Count.EqualTo(1));
+            Assert.That(PartTimeCleaner.Extent[0], Is.SameAs(ptCleaner));
+
+            Assert.That(FullTimeWaiter.Extent, Is.Empty);
+            Assert.That(PartTimeManager.Extent, Is.Empty);
+            Assert.That(PartTimeCook.Extent, Is.Empty);
+            Assert.That(FullTimeCleaner.Extent, Is.Empty);
+        }
+
+        [Test]
+        public void SaveAll_ThenLoadAll_RestoresExtentsCorrectly()
+        {
+            var addr = CreateTestAddress();
+            var tempFile = Path.GetTempFileName();
+
+            var reservationStart = DateTime.Today.AddDays(7).AddHours(19);
+
+            var guest = new Guest("Charlie", "Brown", "Chuck");
+            var reservation = new Reservation(reservationStart, 4, 120.50m)
+            {
+                IsPaid = true,
+                ReviewScore = 5
+            };
+            var ftManager = new FullTimeManager("Alice", "Smith", addr, "PL001", "555-111-222",
+                                                75000m, SeniorityLevel.Senior, vacationDays: 25);
+            var ptWaiter = new PartTimeWaiter("Bob", "Johnson", addr, "PL002", "555-333-444",
+                                              15000m, hoursInContract: 20.5, tips: 5000m);
+
+            Persistence.SaveAll(tempFile);
+            ClearAllExtents();
+
+            var loaded = Persistence.LoadAll(tempFile);
+
+            Assert.That(loaded, Is.True);
+
+            Assert.That(Guest.Extent, Has.Count.EqualTo(1));
+            Assert.That(Guest.Extent[0].FirstName, Is.EqualTo("Charlie"));
+            Assert.That(Guest.Extent[0].LastName, Is.EqualTo("Brown"));
+            Assert.That(Guest.Extent[0].Nickname, Is.EqualTo("Chuck"));
+
+            Assert.That(Reservation.Extent, Has.Count.EqualTo(1));
+            var loadedRes = Reservation.Extent[0];
+            Assert.That(loadedRes.NumberOfGuests, Is.EqualTo(reservation.NumberOfGuests));
+            Assert.That(loadedRes.TotalCost, Is.EqualTo(reservation.TotalCost));
+            Assert.That(loadedRes.IsPaid, Is.EqualTo(reservation.IsPaid));
+            Assert.That(loadedRes.ReviewScore, Is.EqualTo(reservation.ReviewScore));
+
+            Assert.That(FullTimeManager.Extent, Has.Count.EqualTo(1));
+            Assert.That(FullTimeManager.Extent[0].FirstName, Is.EqualTo("Alice"));
+
+            Assert.That(PartTimeWaiter.Extent, Has.Count.EqualTo(1));
+            Assert.That(PartTimeWaiter.Extent[0].FirstName, Is.EqualTo("Bob"));
+
+            Assert.That(FullTimeWaiter.Extent, Is.Empty);
+            Assert.That(PartTimeManager.Extent, Is.Empty);
+            Assert.That(FullTimeCook.Extent, Is.Empty);
+            Assert.That(PartTimeCook.Extent, Is.Empty);
+            Assert.That(FullTimeCleaner.Extent, Is.Empty);
+            Assert.That(PartTimeCleaner.Extent, Is.Empty);
+        }
+    }
+}
