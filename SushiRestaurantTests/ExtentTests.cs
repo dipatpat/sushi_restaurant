@@ -1,3 +1,4 @@
+
 using SushiRestaurant;
 
 
@@ -76,57 +77,99 @@ namespace sushi_restaurant_tests
             Assert.That(PartTimeCook.Extent, Is.Empty);
             Assert.That(FullTimeCleaner.Extent, Is.Empty);
         }
-
+        
         [Test]
         public void SaveAll_ThenLoadAll_RestoresExtentsCorrectly()
         {
             var addr = CreateTestAddress();
             var tempFile = Path.GetTempFileName();
 
-            var reservationStart = DateTime.Today.AddDays(7).AddHours(19);
-
-            var guest = new Guest("Charlie", "Brown", "Chuck");
-            var reservation = new Reservation(reservationStart, 4, 120.50m)
+            try
             {
-                IsPaid = true,
-                ReviewScore = 5
-            };
-            var ftManager = new FullTimeManager("Alice", "Smith", addr, "PL001", "555-111-222",
-                                                75000m, SeniorityLevel.Senior, vacationDays: 25);
-            var ptWaiter = new PartTimeWaiter("Bob", "Johnson", addr, "PL002", "555-333-444",
-                                              15000m, hoursInContract: 20.5, tips: 5000m);
+                var reservationStart = DateTime.Today.AddDays(7).AddHours(19);
 
-            Persistence.SaveAll(tempFile);
-            ClearAllExtents();
+                var guest = new Guest("Charlie", "Brown", "Chuck");
+                var reservation = new Reservation(reservationStart, 4, 120.50m)
+                {
+                    IsPaid = true,
+                    ReviewScore = 5
+                };
+                var ftManager = new FullTimeManager("Alice", "Smith", addr, "PL001", "555-111-222",
+                                                    75000m, SeniorityLevel.Senior, vacationDays: 25);
+                var ptWaiter = new PartTimeWaiter("Bob", "Johnson", addr, "PL002", "555-333-444",
+                                                  15000m, hoursInContract: 20.5, tips: 5000m);
 
-            var loaded = Persistence.LoadAll(tempFile);
+                Persistence.SaveAll(tempFile);
+                ClearAllExtents();
 
-            Assert.That(loaded, Is.True);
+                var loaded = Persistence.LoadAll(tempFile);
+
+                Assert.That(loaded, Is.True);
+
+                Assert.That(Guest.Extent, Has.Count.EqualTo(1));
+                Assert.That(Guest.Extent[0].FirstName, Is.EqualTo("Charlie"));
+                Assert.That(Guest.Extent[0].LastName, Is.EqualTo("Brown"));
+                Assert.That(Guest.Extent[0].Nickname, Is.EqualTo("Chuck"));
+
+                Assert.That(Reservation.Extent, Has.Count.EqualTo(1));
+                var loadedRes = Reservation.Extent[0];
+                Assert.That(loadedRes.NumberOfGuests, Is.EqualTo(reservation.NumberOfGuests));
+                Assert.That(loadedRes.TotalCost, Is.EqualTo(reservation.TotalCost));
+                Assert.That(loadedRes.IsPaid, Is.EqualTo(reservation.IsPaid));
+                Assert.That(loadedRes.ReviewScore, Is.EqualTo(reservation.ReviewScore));
+
+                Assert.That(FullTimeManager.Extent, Has.Count.EqualTo(1));
+                Assert.That(FullTimeManager.Extent[0].FirstName, Is.EqualTo("Alice"));
+
+                Assert.That(PartTimeWaiter.Extent, Has.Count.EqualTo(1));
+                Assert.That(PartTimeWaiter.Extent[0].FirstName, Is.EqualTo("Bob"));
+
+                Assert.That(FullTimeWaiter.Extent, Is.Empty);
+                Assert.That(PartTimeManager.Extent, Is.Empty);
+                Assert.That(FullTimeCook.Extent, Is.Empty);
+                Assert.That(PartTimeCook.Extent, Is.Empty);
+                Assert.That(FullTimeCleaner.Extent, Is.Empty);
+                Assert.That(PartTimeCleaner.Extent, Is.Empty);
+            }
+            finally
+            {
+                if (File.Exists(tempFile))
+                    File.Delete(tempFile);
+            }
+        }
+
+        [Test]
+        public void ModifyingObject_NotInExtent_DoesNotChangeExtent()
+        {
+            var g1 = new Guest("Anna", "Nowak");
+
+            var g2 = new Guest();
+            g2.FirstName = "Ghost";
+            g2.LastName = "User";
+
+            g2.FirstName = "Another";
+            g2.LastName = "Name";
 
             Assert.That(Guest.Extent, Has.Count.EqualTo(1));
-            Assert.That(Guest.Extent[0].FirstName, Is.EqualTo("Charlie"));
-            Assert.That(Guest.Extent[0].LastName, Is.EqualTo("Brown"));
-            Assert.That(Guest.Extent[0].Nickname, Is.EqualTo("Chuck"));
+            Assert.That(Guest.Extent[0], Is.SameAs(g1));
+            Assert.That(Guest.Extent, Does.Not.Contain(g2));
+        }
 
-            Assert.That(Reservation.Extent, Has.Count.EqualTo(1));
-            var loadedRes = Reservation.Extent[0];
-            Assert.That(loadedRes.NumberOfGuests, Is.EqualTo(reservation.NumberOfGuests));
-            Assert.That(loadedRes.TotalCost, Is.EqualTo(reservation.TotalCost));
-            Assert.That(loadedRes.IsPaid, Is.EqualTo(reservation.IsPaid));
-            Assert.That(loadedRes.ReviewScore, Is.EqualTo(reservation.ReviewScore));
+        [Test]
+        public void Extent_IsReadOnly_ExternalCodeCannotModifyExtent()
+        {
+            var g1 = new Guest("Anna", "Nowak");
 
-            Assert.That(FullTimeManager.Extent, Has.Count.EqualTo(1));
-            Assert.That(FullTimeManager.Extent[0].FirstName, Is.EqualTo("Alice"));
+            var extent = Guest.Extent;
 
-            Assert.That(PartTimeWaiter.Extent, Has.Count.EqualTo(1));
-            Assert.That(PartTimeWaiter.Extent[0].FirstName, Is.EqualTo("Bob"));
+            Assert.Throws<NotSupportedException>(() =>
+            {
+                var list = (System.Collections.IList)extent;
+                list.Add(g1);   
+            });
 
-            Assert.That(FullTimeWaiter.Extent, Is.Empty);
-            Assert.That(PartTimeManager.Extent, Is.Empty);
-            Assert.That(FullTimeCook.Extent, Is.Empty);
-            Assert.That(PartTimeCook.Extent, Is.Empty);
-            Assert.That(FullTimeCleaner.Extent, Is.Empty);
-            Assert.That(PartTimeCleaner.Extent, Is.Empty);
+            Assert.That(Guest.Extent.Count, Is.EqualTo(1));
+            Assert.That(Guest.Extent[0], Is.SameAs(g1));
         }
     }
 }
