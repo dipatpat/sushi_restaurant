@@ -31,7 +31,10 @@ public class Reservation
     }
 
     [JsonIgnore] 
-    public DateTime EndDateTime => StartDateTime.AddHours(DurationHours);
+    public DateTime EndDateTime
+    {
+        get { return StartDateTime.AddHours(DurationHours); }
+    }
 
     private decimal _totalCost;
     public decimal TotalCost
