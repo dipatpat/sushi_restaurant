@@ -49,7 +49,7 @@ public class Program
         }
 
         ClearAllExtents();
-        PrintCounts("After manual clear (simulate fresh app)");
+        PrintCounts("After manual clear)");
 
         var reloaded = Persistence.LoadAll();
         Console.WriteLine(reloaded ? "Reloaded from sushi.json." : "Reload failed.");
