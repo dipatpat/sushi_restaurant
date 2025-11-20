@@ -27,12 +27,12 @@ public class Person
         }
     }
 
-    protected Person(string firstName, string lastName)
+    public Person(string firstName, string lastName)
     {
         FirstName = firstName; 
         LastName  = lastName;
     }
 
-    protected Person() { }
+    public Person() { }
 }
 
