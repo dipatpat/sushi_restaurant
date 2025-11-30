@@ -16,10 +16,26 @@ namespace sushi_restaurant_tests
         }
 
         [Test]
+        public void Constructor_EmptyName_ThrowsArgumentException()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => new Ingredient("   ", 1));
+
+            Assert.That(ex!.ParamName, Is.EqualTo("Name"));
+            Assert.That(ex.Message, Does.Contain("Ingredient name is required."));
+        }
+
+        [Test]
+        public void Constructor_NonPositiveQuantity_ThrowsArgumentOutOfRangeException()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Ingredient("Water", 0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Ingredient("Water", -10));
+        }
+
+        [Test]
         public void AddInventoryBatch_CreatesQualifiedAssociation()
         {
             var ingredient = new Ingredient("Sugar", 100);
-            var date1 = new DateTime(2026, 1, 1);
+            var date1 = new DateTime(2025, 1, 1);
             var batch1 = new Inventory("Sugar", 500, date1);
         
             ingredient.AddInventoryBatch(batch1);
@@ -33,7 +49,7 @@ namespace sushi_restaurant_tests
         public void AddInventoryBatch_PreventsDuplicateQualifier()
         {
             var ingredient = new Ingredient("Salt", 50);
-            var date = new DateTime(2026, 2, 1);
+            var date = new DateTime(2025, 2, 1);
             var batchA = new Inventory("Salt", 100, date);
             var batchB = new Inventory("Salt", 200, date);
         
@@ -48,7 +64,7 @@ namespace sushi_restaurant_tests
         public void GetInventoryBatches_ReturnsCopy_PreventsExternalModification()
         {
             var ingredient = new Ingredient("Milk", 200);
-            var date = new DateTime(2026, 3, 1);
+            var date = new DateTime(2025, 3, 1);
             var batch = new Inventory("Milk", 1000, date);
             ingredient.AddInventoryBatch(batch);
         
@@ -62,7 +78,7 @@ namespace sushi_restaurant_tests
         public void RemoveInventoryBatch_DeletesAssociation()
         {
             var ingredient = new Ingredient("Butter", 50);
-            var date = new DateTime(2026, 4, 1);
+            var date = new DateTime(2025, 4, 1);
             var batch = new Inventory("Butter", 500, date);
             ingredient.AddInventoryBatch(batch);
 
@@ -77,7 +93,7 @@ namespace sushi_restaurant_tests
         {
             var required = 50;
             var ingredient = new Ingredient("Cream", required);
-            var date = new DateTime(2026, 5, 1);
+            var date = new DateTime(2025, 5, 1);
             var initialQuantity = 100;
             var batch = new Inventory("Cream", initialQuantity, date);
             ingredient.AddInventoryBatch(batch);
@@ -93,10 +109,10 @@ namespace sushi_restaurant_tests
             var required = 50;
             var ingredient = new Ingredient("Yeast", required);
             
-            var date1 = new DateTime(2026, 7, 1);
+            var date1 = new DateTime(2025, 7, 1);
             var batch1 = new Inventory("Yeast", 20, date1);
             
-            var date2 = new DateTime(2026, 7, 15);
+            var date2 = new DateTime(2025, 7, 15);
             var batch2 = new Inventory("Yeast", 100, date2);
             
             Inventory.AddProduct(batch1); 
@@ -120,13 +136,13 @@ namespace sushi_restaurant_tests
             var required = 100;
             var ingredient = new Ingredient("Dough", required);
             
-            var date1 = new DateTime(2026, 8, 1);
+            var date1 = new DateTime(2025, 8, 1);
             var batch1 = new Inventory("Dough", 10, date1);
             
-            var date2 = new DateTime(2026, 8, 15);
+            var date2 = new DateTime(2025, 8, 15);
             var batch2 = new Inventory("Dough", 30, date2);
             
-            var date3 = new DateTime(2026, 8, 30);
+            var date3 = new DateTime(2025, 8, 30);
             var batch3 = new Inventory("Dough", 100, date3);
             
             Inventory.AddProduct(batch1);
@@ -152,7 +168,7 @@ namespace sushi_restaurant_tests
             var required = 50;
             var ingredient = new Ingredient("Tuna", required);
             
-            var date1 = new DateTime(2026, 9, 1);
+            var date1 = new DateTime(2025, 9, 1);
             var batch1 = new Inventory("Tuna", 20, date1);
             
             Inventory.AddProduct(batch1);

@@ -5,8 +5,30 @@ namespace SushiRestaurant;
 
 public class Ingredient
 {
-    public string Name { get; private set; }
-    public int Quantity { get; private set; }
+    private string _name = default!;
+    private int _quantity;
+
+    public string Name
+    {
+        get => _name;
+        private set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Ingredient name is required.", nameof(Name));
+            _name = value.Trim();
+        }
+    }
+    
+    public int Quantity
+    {
+        get => _quantity;
+        private set
+        {
+            if (value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(Quantity), "Ingredient quantity must be positive.");
+            _quantity = value;
+        }
+    }
 
     private readonly HashSet<Dish> _partOfDishes = new HashSet<Dish>();
     private Dictionary<DateTime, Inventory> _inventoryBatches = new Dictionary<DateTime, Inventory>();

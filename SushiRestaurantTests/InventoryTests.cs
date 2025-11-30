@@ -16,10 +16,72 @@ namespace sushi_restaurant_tests
         }
 
         [Test]
+        public void Constructor_EmptyProductName_ThrowsArgumentException()
+        {
+            var ex = Assert.Throws<ArgumentException>(() =>
+                new Inventory("   ", 100, DateTime.Today));
+
+            Assert.That(ex!.ParamName, Is.EqualTo("ProductName"));
+            Assert.That(ex.Message, Does.Contain("Product name is required."));
+        }
+
+        [Test]
+        public void Constructor_NegativeQuantityLeft_ThrowsArgumentOutOfRangeException()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Inventory("Rice", -10, DateTime.Today));
+        }
+        
+        [Test]
+        public void Constructor_FuturePurchaseDate_ThrowsArgumentOutOfRangeException()
+        {
+            var tomorrow = DateTime.Today.AddDays(1);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                new Inventory("Fish", 10, tomorrow));
+        }
+
+        [Test]
+        public void QuantityLeft_SetNegative_ThrowsArgumentOutOfRangeException()
+        {
+            var batch = new Inventory("Oil", 100, DateTime.Today);
+
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => batch.QuantityLeft = -5);
+            
+            Assert.That(ex!.ParamName, Is.EqualTo("QuantityLeft"));
+        }
+        
+        [Test]
+        public void ExpirationDate_SetBeforePurchaseDate_ThrowsArgumentOutOfRangeException()
+        {
+            var purchaseDate = new DateTime(2025, 10, 15);
+            var expirationDate = new DateTime(2025, 10, 14);
+            
+            var batch = new Inventory("Wasabi", 10, purchaseDate);
+
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
+                batch.ExpirationDate = expirationDate);
+            
+            Assert.That(ex!.ParamName, Is.EqualTo("ExpirationDate"));
+            Assert.That(ex.Message, Does.Contain("Expiration date cannot be before the purchase date."));
+        }
+        
+        [Test]
+        public void ExpirationDate_SetValidDate_Succeeds()
+        {
+            var purchaseDate = new DateTime(2025, 10, 15);
+            var expirationDate = new DateTime(2025, 10, 16);
+            
+            var batch = new Inventory("Ginger", 10, purchaseDate);
+            batch.ExpirationDate = expirationDate;
+
+            Assert.That(batch.ExpirationDate, Is.EqualTo(expirationDate));
+        }
+
+        [Test]
         public void InventoryConstructor_SetsPropertiesCorrectly()
         {
-            var date = new DateTime(2026, 1, 15);
-            var expiry = new DateTime(2026, 7, 15);
+            var date = new DateTime(2025, 1, 15);
+            var expiry = new DateTime(2025, 7, 15);
 
             var batch = new Inventory("Cheese", 50, date, expiry);
 
@@ -32,7 +94,7 @@ namespace sushi_restaurant_tests
         [Test]
         public void InventoryConstructor_HandlesNullExpirationDate()
         {
-            var date = new DateTime(2026, 2, 1);
+            var date = new DateTime(2025, 2, 1);
             var batch = new Inventory("Wine", 10, date);
 
             Assert.That(batch.ExpirationDate, Is.Null);
@@ -41,8 +103,8 @@ namespace sushi_restaurant_tests
         [Test]
         public void AddProduct_AddsToGlobalInventoryList()
         {
-            var batch1 = new Inventory("Tomato", 100, new DateTime(2026, 3, 1));
-            var batch2 = new Inventory("Onion", 50, new DateTime(2026, 3, 2));
+            var batch1 = new Inventory("Tomato", 100, new DateTime(2025, 3, 1));
+            var batch2 = new Inventory("Onion", 50, new DateTime(2025, 3, 2));
 
             Inventory.AddProduct(batch1);
             Inventory.AddProduct(batch2);
@@ -57,7 +119,7 @@ namespace sushi_restaurant_tests
         [Test]
         public void ListAllInventory_ReturnsReadOnlyList()
         {
-            var batch = new Inventory("Potato", 100, new DateTime(2026, 4, 1));
+            var batch = new Inventory("Potato", 100, new DateTime(2025, 4, 1));
             Inventory.AddProduct(batch);
 
             var list = Inventory.ListAllInventory();
