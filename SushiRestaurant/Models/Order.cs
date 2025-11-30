@@ -28,6 +28,30 @@ public class Order
         _reservation = reservation ?? throw new ArgumentNullException(nameof(reservation));
         reservation.InternalAddOrder(this);   
     }
+    
+    public void ChangeReservation(Reservation newReservation)
+    {
+        if (newReservation == null)
+            throw new ArgumentNullException(nameof(newReservation));
+
+        if (DateTime.Now >= _reservation.StartDateTime)
+            throw new InvalidOperationException("Cannot change reservation once the original reservation has started.");
+
+        if (ReferenceEquals(newReservation, _reservation))
+            return;
+
+        var oldReservation = _reservation;
+        _reservation = newReservation;
+
+        oldReservation.InternalRemoveOrder(this);
+        newReservation.InternalAddOrder(this);
+    }
+    
+    public void Remove()
+    {
+        _reservation.InternalRemoveOrder(this);
+        _extent.Remove(this);
+    }
 
 
     private readonly List<Dish> _dishes = new();
@@ -37,12 +61,20 @@ public class Order
     {
         if (dish == null)
             throw new ArgumentNullException(nameof(dish));
+
         if (Status == OrderStatus.Canceled || Status == OrderStatus.Completed)
             throw new InvalidOperationException("Cannot add items to canceled/completed orders.");
 
         _dishes.Add(dish);
     }
 
+    public bool RemoveItemFromOrder(Dish dish)
+    {
+        if (dish == null)
+            throw new ArgumentNullException(nameof(dish));
+
+        return _dishes.Remove(dish);
+    }
 
     [JsonIgnore]
     public decimal OrderSum => _dishes.Sum(d => d.Price);
@@ -60,10 +92,12 @@ public class Order
 
         _extent.Add(this);
     }
-
-
+    
     public void PlaceOrder(bool successful)
     {
+        if (DateTime.Now < Reservation.StartDateTime)
+            throw new InvalidOperationException("Cannot place order before the reservation has started.");
+
         if (Status != OrderStatus.Pending)
             throw new InvalidOperationException("placeOrder can only be called from Pending.");
 
@@ -77,6 +111,7 @@ public class Order
             Status = OrderStatus.Canceled;
             return;
         }
+
         throw new InvalidOperationException("Cannot cancel at this stage.");
     }
 
@@ -86,16 +121,20 @@ public class Order
         switch (Status)
         {
             case OrderStatus.Accepted when newStatus == OrderStatus.Preparing:
-                Status = newStatus; break;
+                Status = newStatus;
+                break;
 
             case OrderStatus.Preparing when newStatus == OrderStatus.Cooked:
-                Status = newStatus; break;
+                Status = newStatus;
+                break;
 
             case OrderStatus.Cooked when newStatus == OrderStatus.Served:
-                Status = newStatus; break;
+                Status = newStatus;
+                break;
 
             case OrderStatus.Served when newStatus == OrderStatus.Completed:
-                Status = newStatus; break;
+                Status = newStatus;
+                break;
 
             default:
                 throw new InvalidOperationException(
