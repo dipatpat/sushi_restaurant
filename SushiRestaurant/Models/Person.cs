@@ -1,6 +1,6 @@
 namespace SushiRestaurant;
 
-public class Person
+public abstract class Person
 {
     private string _firstName = default!;
     private string _lastName  = default!;

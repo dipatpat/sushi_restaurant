@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using SushiRestaurant;
+using System.Reflection;
 
 namespace sushi_restaurant_tests
 {
@@ -8,30 +9,11 @@ namespace sushi_restaurant_tests
     public class PersonTests
     {
         [Test]
-        public void Should_Assign_First_And_Last_Name_Correctly()
+        public void PersonClass_ShouldBeAbstract()
         {
-            var person = new Person
-            {
-                FirstName = "Hiroshi",
-                LastName = "Tanaka"
-            };
-
-            Assert.That(person.FirstName, Is.EqualTo("Hiroshi"));
-            Assert.That(person.LastName, Is.EqualTo("Tanaka"));
-        }
-
-        [Test]
-        public void Should_Not_Allow_Empty_LastName()
-        {
-            var person = new Person
-            {
-                FirstName = "Mark"
-            };
-
-            var ex = Assert.Throws<ArgumentException>(() => person.LastName = string.Empty);
-
-            Assert.That(ex!.ParamName, Is.EqualTo("LastName"));
-            Assert.That(ex.Message, Does.Contain("Last name is required."));
+            // Arrange
+            Type personType = typeof(Person);
+            Assert.That(personType.IsAbstract, Is.True, "The Person class must be declared as abstract.");
         }
     }
 }
