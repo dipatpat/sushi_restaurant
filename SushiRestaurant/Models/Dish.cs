@@ -31,7 +31,13 @@ public class Dish
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("Dish name is required.");
-            _dishName = value.Trim();
+            
+            var trimmed = value.Trim();
+
+            if (trimmed.Length > 20)
+                throw new ArgumentException("Dish name cannot exceed 20 characters.", nameof(DishName));
+
+            _dishName = trimmed;
         }
     }
 
