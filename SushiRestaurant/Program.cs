@@ -16,30 +16,36 @@ public class Program
 
         if (!loaded)
         {
-           
             var g1 = new Guest("Charlie", "Brown", "Chuck");
             var g2 = new Guest("Lucy", "Van Pelt");
 
-            var res = new Reservation(DateTime.Now.AddDays(7).Date.AddHours(19), 4, 120.50m)
+            var res = new Reservation(
+                DateTime.Now.AddDays(7).Date.AddHours(19),
+                numberOfGuests: 4,
+                guest: g1)
             {
                 IsPaid = true,
                 ReviewScore = 5
             };
 
-            var addr = new Address("Main St", "101", "00-001", "Metropolis");
-            var ftMgr = new FullTimeManager("Alice", "Smith", addr, "PL00112233", "555-111-222", 75000m,
-                                            SeniorityLevel.Senior, vacationDays: 25, isOnSickLeave: false);
+            var order = new Order(res);
+            order.AddItemToOrder(new Dish("Sushi Set", 120.50m, DishType.Sushi));
 
-            var ptWaiter = new PartTimeWaiter("Bob", "Johnson", addr, "PL99887766", "555-333-444", 15000m,
-                                              hoursInContract: 20.5, tips: 5000m);
+            var addr = new Address("Main St", "101", "00-001", "Metropolis");
+
+            var ftMgr = new FullTimeManager("Alice", "Smith", addr, "PL00112233", "555-111-222",
+                                            75000m, SeniorityLevel.Senior, vacationDays: 25, isOnSickLeave: false);
+
+            var ptWaiter = new PartTimeWaiter("Bob", "Johnson", addr, "PL99887766", "555-333-444",
+                                              15000m, hoursInContract: 20.5, tips: 5000m);
             ptWaiter.AddLanguage("English");
             ptWaiter.AddLanguage("Spanish");
 
-            var ftCook = new FullTimeCook("Mina", "Tanaka", addr, "PL11223344", "555-777-888", 42000m,
-                                          bonus: 3000m, specialization: "Sushi", vacationDays: 12);
+            var ftCook = new FullTimeCook("Mina", "Tanaka", addr, "PL11223344", "555-777-888",
+                                          42000m, bonus: 3000m, specialization: "Sushi", vacationDays: 12);
 
-            var ptCleaner = new PartTimeCleaner("John", "Doe", addr, "PL55667788", "555-000-111", 22000m,
-                                                cleaningShift: "Evening", assignedArea: "Dining Hall",
+            var ptCleaner = new PartTimeCleaner("John", "Doe", addr, "PL55667788", "555-000-111",
+                                                22000m, cleaningShift: "Evening", assignedArea: "Dining Hall",
                                                 hoursInContract: 15);
 
             PrintCounts("After creating sample data");
@@ -63,7 +69,9 @@ public class Program
         var anyRes = Reservation.Extent.FirstOrDefault();
         if (anyRes != null)
         {
-            Console.WriteLine($"Reservation: starts {anyRes.StartDateTime:g}, ends {anyRes.EndDateTime:g}, guests {anyRes.NumberOfGuests}, paid={anyRes.IsPaid}");
+            Console.WriteLine(
+                $"Reservation: starts {anyRes.StartDateTime:g}, ends {anyRes.EndDateTime:g}, " +
+                $"guests {anyRes.NumberOfGuests}, paid={anyRes.IsPaid}, totalCost={anyRes.TotalCost}");
         }
     }
 
