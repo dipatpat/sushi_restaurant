@@ -16,10 +16,16 @@ namespace sushi_restaurant_tests
 
         private static Reservation CreateReservation(string label = "A")
         {
+            var guest = new Guest
+            {
+                FirstName = "Aiko",
+                LastName = "Sato",
+                Nickname = "SushiQueen"
+            };
             return new Reservation(
                 DateTime.Now.AddHours(2),  
                 numberOfGuests: 2,
-                totalCost: 0m
+                guest: guest
             )
             {
                 Comment = $"Res-{label}"
