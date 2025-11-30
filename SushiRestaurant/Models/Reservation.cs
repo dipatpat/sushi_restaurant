@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+
 namespace SushiRestaurant;
 
 public class Reservation
@@ -27,17 +28,15 @@ public class Reservation
                 throw new ArgumentException("StartDateTime is required.", nameof(StartDateTime));
 
             if (value < DateTime.Now)
-                throw new ArgumentOutOfRangeException(nameof(StartDateTime), "Start date and time must be in the future.");
-            
+                throw new ArgumentOutOfRangeException(nameof(StartDateTime),
+                    "Start date and time must be in the future.");
+
             _startDateTime = value;
         }
     }
 
-    [JsonIgnore] 
-    public DateTime EndDateTime
-    {
-        get { return StartDateTime.AddHours(DurationHours); }
-    }
+    [JsonIgnore]
+    public DateTime EndDateTime => StartDateTime.AddHours(DurationHours);
 
     private decimal _totalCost;
     public decimal TotalCost
@@ -90,7 +89,8 @@ public class Reservation
         set
         {
             if (value < 1 || value > 10)
-                throw new ArgumentOutOfRangeException(nameof(NumberOfGuests), "Number of guests must be between 1 and 10.");
+                throw new ArgumentOutOfRangeException(nameof(NumberOfGuests),
+                    "Number of guests must be between 1 and 10.");
             _numberOfGuests = value;
         }
     }
@@ -109,11 +109,37 @@ public class Reservation
         }
     }
 
+    private readonly List<Order> _orders = new();
+    [JsonIgnore]
+    public IReadOnlyCollection<Order> Orders => _orders.AsReadOnly();
+
+    internal void InternalAddOrder(Order order)
+    {
+        if (order is null) throw new ArgumentNullException(nameof(order));
+        if (!_orders.Contains(order))
+            _orders.Add(order);
+
+        _totalCost = GetTotalCost();
+    }
+
+    internal void InternalRemoveOrder(Order order)
+    {
+        if (order is null) throw new ArgumentNullException(nameof(order));
+        _orders.Remove(order);
+        _totalCost = GetTotalCost();
+    }
+
+   
+    public decimal GetTotalCost()
+    {
+        return _orders.Sum(o => o.OrderSum);
+    }
+
     public Reservation(DateTime startDateTime, int numberOfGuests, decimal totalCost)
     {
-        StartDateTime = startDateTime; 
+        StartDateTime = startDateTime;
         NumberOfGuests = numberOfGuests;
-        TotalCost = totalCost;         
+        TotalCost = totalCost;   
         _extent.Add(this);
     }
 

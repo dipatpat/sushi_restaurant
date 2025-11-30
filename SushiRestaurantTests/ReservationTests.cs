@@ -98,14 +98,46 @@ namespace sushi_restaurant_tests
             Assert.That(reservation.IsPaid, Is.True);
         }
 
+     
         [Test]
-        public void Should_Set_And_Get_TotalCost()
+        public void New_Reservation_Should_Have_Empty_Orders_Collection()
         {
             var reservation = new Reservation();
-            reservation.TotalCost = 150.75m;
 
-            Assert.That(150.75m, Is.EqualTo(reservation.TotalCost));
+            Assert.That(reservation.Orders, Is.Empty);
         }
+
+        [Test]
+        public void Creating_Order_For_Reservation_Adds_It_To_Orders_Collection()
+        {
+            var reservation = new Reservation(
+                DateTime.Now.AddHours(2), numberOfGuests: 2, totalCost: 0m);
+
+            var order = new Order(reservation); 
+
+            Assert.That(reservation.Orders, Has.Count.EqualTo(1));
+            Assert.That(reservation.Orders.First(), Is.SameAs(order));
+        }
+
+        [Test]
+        public void GetTotalCost_Should_Sum_OrderSums_For_All_Orders()
+        {
+            var reservation = new Reservation(
+                DateTime.Now.AddHours(2), numberOfGuests: 2, totalCost: 0m);
+
+            var order1 = new Order(reservation);
+            var order2 = new Order(reservation);
+
+            order1.AddItemToOrder(new Dish("Miso Soup", 10m, DishType.Starter));
+            order1.AddItemToOrder(new Dish("Green Tea", 5m, DishType.Drink));
+
+            order2.AddItemToOrder(new Dish("Salmon Nigiri", 20m, DishType.Sushi));
+
+            var expectedTotal = 10m + 5m + 20m;
+
+            Assert.That(reservation.GetTotalCost(), Is.EqualTo(expectedTotal));
+        }
+    
     }
 }
 
