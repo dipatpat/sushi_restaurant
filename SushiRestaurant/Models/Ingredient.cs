@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+namespace SushiRestaurant;
 
 public class Ingredient
 {
     public string Name { get; private set; }
     public int Quantity { get; private set; }
 
+    private readonly HashSet<Dish> _partOfDishes = new HashSet<Dish>();
     private Dictionary<DateTime, Inventory> _inventoryBatches = new Dictionary<DateTime, Inventory>();
 
     public Ingredient(string name, int quantity)
@@ -15,9 +17,32 @@ public class Ingredient
         Quantity = quantity;
     }
 
+    public IReadOnlySet<Dish> GetPartByDishes()
+    {
+        return new HashSet<Dish>(_partOfDishes);
+    }
+
     public IReadOnlyDictionary<DateTime, Inventory> GetInventoryBatches()
     {
         return new Dictionary<DateTime, Inventory>(_inventoryBatches);
+    }
+
+    internal void AddDish(Dish dish)
+    {
+        if (dish == null || _partOfDishes.Contains(dish))
+        {
+            return; 
+        }
+        _partOfDishes.Add(dish);
+    }
+
+    internal void RemoveDish(Dish dish)
+    {
+        if (dish == null || !_partOfDishes.Contains(dish))
+        {
+            return;
+        }
+        _partOfDishes.Remove(dish);
     }
 
     public void AddInventoryBatch(Inventory inventoryItem)

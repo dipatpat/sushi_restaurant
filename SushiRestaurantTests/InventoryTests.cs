@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SushiRestaurant;
 
 namespace sushi_restaurant_tests
 {

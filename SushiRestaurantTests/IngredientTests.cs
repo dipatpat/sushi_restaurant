@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SushiRestaurant;
 
 namespace sushi_restaurant_tests
 {
@@ -161,6 +162,53 @@ namespace sushi_restaurant_tests
 
             Assert.That(batch1.QuantityLeft, Is.EqualTo(0));
             Assert.That(ingredient.GetInventoryBatches().Count, Is.EqualTo(0)); 
+        }
+
+        [Test]
+        public void GetPartByDishes_ReturnsCopy_PreventsExternalModification()
+        {
+            var ingredient = new Ingredient("Wasabi Paste", 5);
+            var dish = new Dish("Wasabi Bomb", 1m, DishType.Sushi);
+            dish.AddIngredient(ingredient);
+
+            var externalCopy = ingredient.GetPartByDishes();
+
+            Assert.That(externalCopy.Count, Is.EqualTo(1));
+            Assert.That(ingredient.GetPartByDishes().Count, Is.EqualTo(1)); 
+        }
+
+        [Test]
+        public void AddDish_InternalMethod_CreatesLinkFromDishCall()
+        {
+            var ingredient = new Ingredient("Avocado", 50);
+            var dish1 = new Dish("Avocado Roll", 10m, DishType.Sushi);
+            var dish2 = new Dish("Veggie Bowl", 15m, DishType.Starter);
+
+            dish1.AddIngredient(ingredient);
+            dish2.AddIngredient(ingredient);
+
+            var linkedDishes = ingredient.GetPartByDishes();
+            Assert.That(linkedDishes, Contains.Item(dish1));
+            Assert.That(linkedDishes, Contains.Item(dish2));
+            Assert.That(linkedDishes.Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void RemoveDish_InternalMethod_RemovesLinkFromDishCall()
+        {
+            var ingredient = new Ingredient("Soy Sauce", 10);
+            var dish1 = new Dish("Sashimi Platter", 30m, DishType.Sushi);
+            var dish2 = new Dish("Edamame", 5m, DishType.Starter);
+            
+            dish1.AddIngredient(ingredient);
+            dish2.AddIngredient(ingredient);
+
+            dish1.RemoveIngredient(ingredient);
+
+            var linkedDishes = ingredient.GetPartByDishes();
+            Assert.That(linkedDishes, Does.Not.Contain(dish1));
+            Assert.That(linkedDishes, Contains.Item(dish2));
+            Assert.That(linkedDishes.Count, Is.EqualTo(1));
         }
     }
 }

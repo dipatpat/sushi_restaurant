@@ -146,5 +146,65 @@ namespace sushi_restaurant_tests
             Assert.That(Dish.Extent.Count, Is.EqualTo(1));
             Assert.That(Dish.Extent[0], Is.SameAs(d1));
         }
+
+        [Test]
+        public void AddIngredient_CreatesBidirectionalLinkAndReverseConnection()
+        {
+            var dish = new Dish("Tuna Roll", 30m, DishType.Sushi);
+            var ingredient = new Ingredient("Rice", 200); 
+
+            dish.AddIngredient(ingredient);
+
+            Assert.That(dish.GetIngredients(), Contains.Item(ingredient));
+            Assert.That(dish.GetIngredients().Count, Is.EqualTo(1));
+            
+            Assert.That(ingredient.GetPartByDishes(), Contains.Item(dish), "Reverse link must be created on Ingredient.");
+            Assert.That(ingredient.GetPartByDishes().Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void AddIngredient_PreventsDuplicateAssociation()
+        {
+            var dish = new Dish("Sake Sushi", 20m, DishType.Sushi);
+            var ingredient = new Ingredient("Salmon", 50);
+
+            dish.AddIngredient(ingredient);
+            dish.AddIngredient(ingredient);
+
+            Assert.That(dish.GetIngredients().Count, Is.EqualTo(1), "Duplicate ingredient should not be added to Dish.");
+            Assert.That(ingredient.GetPartByDishes().Count, Is.EqualTo(1), "Duplicate reverse link should not be created.");
+        }
+
+        [Test]
+        public void RemoveIngredient_RemovesBidirectionalLinkAndReverseConnection()
+        {
+            var dish = new Dish("Cucumber Maki", 15m, DishType.Sushi);
+            var cucumber = new Ingredient("Cucumber", 20);
+            var seaweed = new Ingredient("Seaweed", 5);
+            
+            dish.AddIngredient(cucumber);
+            dish.AddIngredient(seaweed);
+
+            dish.RemoveIngredient(cucumber);
+
+            Assert.That(dish.GetIngredients(), Does.Not.Contain(cucumber));
+            Assert.That(dish.GetIngredients().Count, Is.EqualTo(1));
+            
+            Assert.That(cucumber.GetPartByDishes(), Is.Empty, "Reverse link must be removed from Ingredient.");
+            Assert.That(seaweed.GetPartByDishes(), Contains.Item(dish));
+        }
+
+        [Test]
+        public void GetIngredients_ReturnsCopy_PreventsExternalModification()
+        {
+            var dish = new Dish("Tempura", 18m, DishType.Starter);
+            var prawn = new Ingredient("Prawn", 5);
+            dish.AddIngredient(prawn);
+            
+            var externalCopy = dish.GetIngredients();
+
+            Assert.That(externalCopy.Count, Is.EqualTo(1));
+            Assert.That(dish.GetIngredients().Count, Is.EqualTo(1));
+        }
     }
 }
