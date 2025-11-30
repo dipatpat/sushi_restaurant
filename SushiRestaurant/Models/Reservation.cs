@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using System.Linq;
 
 namespace SushiRestaurant;
 
@@ -17,6 +18,31 @@ public class Reservation
     }
 
     public static int DurationHours = 3;
+
+    private Guest _guest = default!;
+    public Guest Guest => _guest;
+
+    private void SetGuest(Guest guest)
+    {
+        _guest = guest ?? throw new ArgumentNullException(nameof(guest));
+        guest.InternalAddReservation(this);   
+    }
+    
+    public void ChangeGuest(Guest newGuest)
+    {
+        if (newGuest is null)
+            throw new ArgumentNullException(nameof(newGuest));
+
+        if (ReferenceEquals(newGuest, _guest))
+            return;
+
+        var oldGuest = _guest;
+        _guest = newGuest;
+
+        oldGuest.InternalRemoveReservation(this);
+        newGuest.InternalAddReservation(this);
+    }
+
 
     private DateTime _startDateTime;
     public DateTime StartDateTime
@@ -38,18 +64,6 @@ public class Reservation
     [JsonIgnore]
     public DateTime EndDateTime => StartDateTime.AddHours(DurationHours);
 
-    private decimal _totalCost;
-    public decimal TotalCost
-    {
-        get => _totalCost;
-        set
-        {
-            if (value < 0)
-                throw new ArgumentOutOfRangeException(nameof(TotalCost), "Total cost cannot be negative.");
-            _totalCost = value;
-        }
-    }
-
     private int? _reviewScore;
     public int? ReviewScore
     {
@@ -57,7 +71,8 @@ public class Reservation
         set
         {
             if (value is < 0 or > 5)
-                throw new ArgumentOutOfRangeException(nameof(ReviewScore), "Review score must be between 0 and 5.");
+                throw new ArgumentOutOfRangeException(nameof(ReviewScore),
+                    "Review score must be between 0 and 5.");
             _reviewScore = value;
         }
     }
@@ -104,11 +119,12 @@ public class Reservation
         set
         {
             if (value < 0)
-                throw new ArgumentOutOfRangeException(nameof(BonusPoints), "Bonus points cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(BonusPoints),
+                    "Bonus points cannot be negative.");
             _bonusPoints = value;
         }
     }
-
+    
     private readonly List<Order> _orders = new();
     [JsonIgnore]
     public IReadOnlyCollection<Order> Orders => _orders.AsReadOnly();
@@ -118,30 +134,28 @@ public class Reservation
         if (order is null) throw new ArgumentNullException(nameof(order));
         if (!_orders.Contains(order))
             _orders.Add(order);
-
-        _totalCost = GetTotalCost();
     }
 
     internal void InternalRemoveOrder(Order order)
     {
         if (order is null) throw new ArgumentNullException(nameof(order));
         _orders.Remove(order);
-        _totalCost = GetTotalCost();
     }
+    
+    [JsonIgnore]
+    public decimal TotalCost => GetTotalCost();
 
-   
-    public decimal GetTotalCost()
-    {
-        return _orders.Sum(o => o.OrderSum);
-    }
+    public decimal GetTotalCost() => _orders.Sum(o => o.OrderSum);
 
-    public Reservation(DateTime startDateTime, int numberOfGuests, decimal totalCost)
+
+    public Reservation(DateTime startDateTime, int numberOfGuests, Guest guest)
     {
         StartDateTime = startDateTime;
         NumberOfGuests = numberOfGuests;
-        TotalCost = totalCost;   
+        SetGuest(guest);
+
         _extent.Add(this);
     }
-
+    
     public Reservation() { }
 }
