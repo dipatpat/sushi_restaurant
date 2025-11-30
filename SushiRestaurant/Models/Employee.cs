@@ -45,41 +45,12 @@ public abstract class Employee : Person
             _baseSalary = value;
         }
     }
-    
-       public abstract decimal Salary { get; }
-   
-       public bool IsFullTime { get; protected set; }
-       private readonly List<Contract> _contracts = new();
-       public IReadOnlyCollection<Contract> Contracts => _contracts.AsReadOnly();
-   
-       public void AddContract(Contract contract) {
-           
-           if (contract == null)
-               throw new ArgumentNullException(nameof(contract));
-   
-           if (_contracts.Contains(contract))
-               throw new InvalidOperationException("This contract is already assigned to this employee.");
-   
-           _contracts.Add(contract);
-           
-           if (contract.Employee != this)
-               contract.SetEmployee(this);
-       }
-   
-       public void RemoveContract(Contract contract) {
-           
-           if (!_contracts.Contains(contract))
-               throw new InvalidOperationException("This employee does not have this contract.");
-   
-           if (_contracts.Count == 1)
-               throw new InvalidOperationException("Employee must have at least one contract (1..*).");
-   
-           _contracts.Remove(contract);
-   
-           if (contract.Employee == this)
-               contract.RemoveEmployee(this);
-       }
-       
+
+    [JsonIgnore] 
+    public abstract decimal Salary { get; }
+
+    public bool IsFullTime { get; protected set; }
+
     protected Employee(string firstName, string lastName, Address address,
         string bankAccount, string phoneNumber, decimal baseSalary, bool isFullTime)
         : base(firstName, lastName)
