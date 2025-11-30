@@ -17,7 +17,7 @@ namespace sushi_restaurant_tests
         private static Reservation CreateReservation(string label = "A")
         {
             return new Reservation(
-                DateTime.Now.AddHours(2),   // must be in the future
+                DateTime.Now.AddHours(2),  
                 numberOfGuests: 2,
                 totalCost: 0m
             )

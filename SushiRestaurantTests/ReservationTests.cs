@@ -1,11 +1,16 @@
-﻿using SushiRestaurant;
-
+﻿using System;
+using System.Linq;
+using NUnit.Framework;
+using SushiRestaurant;
 
 namespace sushi_restaurant_tests
 {
     [TestFixture]
     public class ReservationTests
     {
+        private static Guest CreateGuest() =>
+            new Guest("Anna", "Nowak");
+
         [Test]
         public void Should_Calculate_EndDateTime_As_Start_Plus_3_Hours()
         {
@@ -22,7 +27,8 @@ namespace sushi_restaurant_tests
         {
             var reservation = new Reservation();
             reservation.ReviewScore = 4;
-            Assert.That(4, Is.EqualTo(reservation.ReviewScore));
+
+            Assert.That(reservation.ReviewScore, Is.EqualTo(4));
         }
 
         [Test]
@@ -53,7 +59,7 @@ namespace sushi_restaurant_tests
             var reservation = new Reservation();
             reservation.NumberOfGuests = 6;
 
-            Assert.That(6, Is.EqualTo(reservation.NumberOfGuests));
+            Assert.That(reservation.NumberOfGuests, Is.EqualTo(6));
         }
 
         [Test]
@@ -83,7 +89,7 @@ namespace sushi_restaurant_tests
         {
             var reservation = new Reservation();
 
-            Assert.That(0, Is.EqualTo(reservation.BonusPoints));
+            Assert.That(reservation.BonusPoints, Is.EqualTo(0));
         }
 
         [Test]
@@ -94,11 +100,11 @@ namespace sushi_restaurant_tests
                 Comment = "Perfect dinner experience!",
                 IsPaid = true
             };
-            Assert.That("Perfect dinner experience!", Is.EqualTo(reservation.Comment));
+
+            Assert.That(reservation.Comment, Is.EqualTo("Perfect dinner experience!"));
             Assert.That(reservation.IsPaid, Is.True);
         }
 
-     
         [Test]
         public void New_Reservation_Should_Have_Empty_Orders_Collection()
         {
@@ -110,10 +116,13 @@ namespace sushi_restaurant_tests
         [Test]
         public void Creating_Order_For_Reservation_Adds_It_To_Orders_Collection()
         {
+            var guest = CreateGuest();
             var reservation = new Reservation(
-                DateTime.Now.AddHours(2), numberOfGuests: 2, totalCost: 0m);
+                DateTime.Now.AddHours(2),
+                numberOfGuests: 2,
+                guest: guest);
 
-            var order = new Order(reservation); 
+            var order = new Order(reservation);
 
             Assert.That(reservation.Orders, Has.Count.EqualTo(1));
             Assert.That(reservation.Orders.First(), Is.SameAs(order));
@@ -122,8 +131,11 @@ namespace sushi_restaurant_tests
         [Test]
         public void GetTotalCost_Should_Sum_OrderSums_For_All_Orders()
         {
+            var guest = CreateGuest();
             var reservation = new Reservation(
-                DateTime.Now.AddHours(2), numberOfGuests: 2, totalCost: 0m);
+                DateTime.Now.AddHours(2),
+                numberOfGuests: 2,
+                guest: guest);
 
             var order1 = new Order(reservation);
             var order2 = new Order(reservation);
@@ -136,11 +148,7 @@ namespace sushi_restaurant_tests
             var expectedTotal = 10m + 5m + 20m;
 
             Assert.That(reservation.GetTotalCost(), Is.EqualTo(expectedTotal));
+            Assert.That(reservation.TotalCost, Is.EqualTo(expectedTotal));
         }
-    
     }
 }
-
-    
-
-    
