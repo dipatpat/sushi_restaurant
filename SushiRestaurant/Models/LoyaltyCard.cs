@@ -31,7 +31,6 @@ namespace SushiRestaurant.Models
             NumberOfPoints = points;
             owner.LoyaltyCard = this;
         }
-
         public void ChangeNumberOfPoints(int delta)
         {
             if (NumberOfPoints + delta < 0)
@@ -39,7 +38,6 @@ namespace SushiRestaurant.Models
 
             NumberOfPoints += delta;
         }
-
         public void UpgradeTier()
         {
             if (LoyaltyType == LoyaltyType.vip)

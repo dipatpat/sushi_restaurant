@@ -103,6 +103,5 @@ namespace SushiRestaurantTests
 
             Assert.Throws<ArgumentNullException>(() => e.AssignMentor(null!));
         }
-        
     }
 }

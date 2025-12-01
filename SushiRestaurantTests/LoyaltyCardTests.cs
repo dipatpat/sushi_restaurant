@@ -1,6 +1,4 @@
-﻿
-
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using SushiRestaurant;
 using SushiRestaurant.Models;
 
