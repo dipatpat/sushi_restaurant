@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using SushiRestaurant.Models;
+
 namespace SushiRestaurant;
 
 public class Guest : Person
@@ -25,6 +27,26 @@ public class Guest : Person
                 throw new ArgumentException("Nickname cannot be empty when provided.", nameof(Nickname));
             _nickname = value?.Trim();
         }
+    }
+    
+    public LoyaltyCard? LoyaltyCard { get; set; }
+    private readonly List<Reservation> _reservations = new();
+    
+    [JsonIgnore]
+    public IReadOnlyCollection<Reservation> Reservations => _reservations.AsReadOnly();
+    
+    internal void InternalAddReservation(Reservation reservation)
+    
+    {
+        if (reservation is null) throw new ArgumentNullException(nameof(reservation));
+        if (!_reservations.Contains(reservation))
+            _reservations.Add(reservation);
+    }
+    
+    internal void InternalRemoveReservation(Reservation reservation)
+    {
+        if (reservation is null) throw new ArgumentNullException(nameof(reservation));
+        _reservations.Remove(reservation);
     }
 
     public Guest(string firstName, string lastName, string? nickname = null)
