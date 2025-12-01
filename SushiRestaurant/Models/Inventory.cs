@@ -5,6 +5,18 @@ namespace SushiRestaurant;
 
 public class Inventory
 {
+    private static readonly List<Inventory> _extent = new();
+    public static IReadOnlyList<Inventory> Extent => _extent.AsReadOnly();
+
+    public static void ClearExtent() => _extent.Clear();
+
+    internal static void SetExtent(List<Inventory>? items)
+    {
+        _extent.Clear();
+        if (items is { Count: > 0 })
+            _extent.AddRange(items);
+    }
+
     private string _productName = default!;
     private int _quantityLeft;
     private DateTime _purchaseDate;
@@ -64,7 +76,11 @@ public class Inventory
         QuantityLeft = quantityLeft;
         PurchaseDate = purchaseDate;
         ExpirationDate = expirationDate;
+
+        _extent.Add(this);
     }
+
+    public Inventory() {}
 
     public static void ListInventory()
     {

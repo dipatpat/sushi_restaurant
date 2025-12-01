@@ -12,7 +12,35 @@ namespace sushi_restaurant_tests
         [SetUp]
         public void Setup()
         {
+            Inventory.ClearExtent();
             Inventory.ClearAllInventory();
+        }
+
+        [Test]
+        public void Constructor_ValidData_CreatesInventoryAndAddsToExtent()
+        {
+            var date = DateTime.Today;
+            var productName = "Avocado";
+            var quantity = 50;
+            
+            var inventory = new Inventory(productName, quantity, date);
+
+            Assert.That(Inventory.Extent, Has.Count.EqualTo(1));
+            Assert.That(Inventory.Extent[0], Is.SameAs(inventory));
+        }
+
+        [Test]
+        public void ClearExtent_RemovesAllItemsFromPersistence()
+        {
+
+            new Inventory("Rice", 100, DateTime.Today.AddDays(-1));
+            new Inventory("Vinegar", 5, DateTime.Today);
+
+            Assert.That(Inventory.Extent, Has.Count.EqualTo(2));
+
+            Inventory.ClearExtent();
+
+            Assert.That(Inventory.Extent, Is.Empty);
         }
 
         [Test]
