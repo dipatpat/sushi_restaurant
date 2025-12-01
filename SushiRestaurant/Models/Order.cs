@@ -66,14 +66,20 @@ public class Order
             throw new InvalidOperationException("Cannot add items to canceled/completed orders.");
 
         _dishes.Add(dish);
+        _reservation.RegisterCostSnapshot();
     }
 
     public bool RemoveItemFromOrder(Dish dish)
     {
         if (dish == null)
             throw new ArgumentNullException(nameof(dish));
+        var  removed = _dishes.Remove(dish);
+        if (removed)
+        {
+            _reservation.RegisterCostSnapshot();
+        }
 
-        return _dishes.Remove(dish);
+        return removed;
     }
 
     [JsonIgnore]

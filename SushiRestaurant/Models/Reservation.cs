@@ -134,18 +134,31 @@ public class Reservation
         if (order is null) throw new ArgumentNullException(nameof(order));
         if (!_orders.Contains(order))
             _orders.Add(order);
+        RegisterCostSnapshot();
     }
 
     internal void InternalRemoveOrder(Order order)
     {
         if (order is null) throw new ArgumentNullException(nameof(order));
         _orders.Remove(order);
+        
+        RegisterCostSnapshot();
     }
     
     [JsonIgnore]
     public decimal TotalCost => GetTotalCost();
 
     public decimal GetTotalCost() => _orders.Sum(o => o.OrderSum);
+    
+    private readonly List<decimal> _totalCostHistory = new();
+    
+    [JsonIgnore]
+    public IReadOnlyCollection<decimal> TotalCostHistory => _totalCostHistory.AsReadOnly();
+
+    internal void RegisterCostSnapshot()
+    {
+        _totalCostHistory.Add(GetTotalCost());
+    }
 
 
     public Reservation(DateTime startDateTime, int numberOfGuests, Guest guest)
@@ -155,6 +168,7 @@ public class Reservation
         SetGuest(guest);
 
         _extent.Add(this);
+        RegisterCostSnapshot();
     }
     
     public Reservation() { }
