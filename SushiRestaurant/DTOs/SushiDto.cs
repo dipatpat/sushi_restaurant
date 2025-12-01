@@ -16,4 +16,8 @@ public class SushiDto
 
     public List<FullTimeCleaner> FullTimeCleaners { get; set; } = new();
     public List<PartTimeCleaner> PartTimeCleaners { get; set; } = new();
+
+    public List<Dish> Dishes { get; set; } = new();
+    public List<Ingredient> Ingredients { get; set; } = new();
+    public List<Inventory> Inventory { get; set; } = new();
 }

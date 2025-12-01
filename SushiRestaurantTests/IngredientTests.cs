@@ -12,7 +12,34 @@ namespace sushi_restaurant_tests
         [SetUp]
         public void Setup()
         {
-        Inventory.ClearAllInventory();
+            Inventory.ClearAllInventory();
+            Dish.ClearExtent(); 
+            Ingredient.ClearExtent();
+        }
+
+        [Test]
+        public void Constructor_ValidData_CreatesIngredientAndAddsToExtent()
+        {
+            var name = "Sugar";
+            var quantity = 100;
+
+            var ingredient = new Ingredient(name, quantity);
+
+            Assert.That(Ingredient.Extent, Has.Count.EqualTo(1));
+            Assert.That(Ingredient.Extent[0], Is.SameAs(ingredient));
+        }
+
+        [Test]
+        public void ClearExtent_RemovesAllItemsFromPersistence()
+        {
+            new Ingredient("Nori", 50);
+            new Ingredient("Tuna", 10);
+
+            Assert.That(Ingredient.Extent, Has.Count.EqualTo(2));
+
+            Ingredient.ClearExtent();
+
+            Assert.That(Ingredient.Extent, Is.Empty);
         }
 
         [Test]

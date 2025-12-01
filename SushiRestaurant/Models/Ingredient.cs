@@ -5,6 +5,18 @@ namespace SushiRestaurant;
 
 public class Ingredient
 {
+    private static readonly List<Ingredient> _extent = new();
+    public static IReadOnlyList<Ingredient> Extent => _extent.AsReadOnly();
+
+    public static void ClearExtent() => _extent.Clear();
+
+    internal static void SetExtent(List<Ingredient>? items)
+    {
+        _extent.Clear();
+        if (items is { Count: > 0 })
+            _extent.AddRange(items);
+    }
+
     private string _name = default!;
     private int _quantity;
 
@@ -37,7 +49,11 @@ public class Ingredient
     {
         Name = name;
         Quantity = quantity;
+
+        _extent.Add(this);
     }
+
+    public Ingredient() {}
 
     public IReadOnlySet<Dish> GetPartByDishes()
     {
