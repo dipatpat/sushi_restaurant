@@ -72,7 +72,7 @@ public abstract class Employee : Person
                throw new InvalidOperationException("This employee does not have this contract.");
    
            if (_contracts.Count == 1)
-               throw new InvalidOperationException("Employee must have at least one contract (1..*).");
+               throw new InvalidOperationException("Employee must have at least one contract.");
    
            _contracts.Remove(contract);
    
