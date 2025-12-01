@@ -48,6 +48,22 @@ public class Guest : Person
         if (reservation is null) throw new ArgumentNullException(nameof(reservation));
         _reservations.Remove(reservation);
     }
+    
+    public SushiRestaurant.Models.LoyaltyCard CreateLoyaltyCard(
+        string email, 
+        SushiRestaurant.Models.LoyaltyType type, 
+        int points)
+    {
+        if (LoyaltyCard != null)
+            throw new InvalidOperationException("Guest already has a loyalty card.");
+
+        return new SushiRestaurant.Models.LoyaltyCard(this, email, type, points);
+    }
+
+    public void RemoveLoyaltyCard()
+    {
+        LoyaltyCard = null;
+    }
 
     public Guest(string firstName, string lastName, string? nickname = null)
         : base(firstName, lastName)
@@ -55,6 +71,7 @@ public class Guest : Person
         Nickname = nickname;
         _extent.Add(this);
     }
+
 
     public Guest() { }
 
