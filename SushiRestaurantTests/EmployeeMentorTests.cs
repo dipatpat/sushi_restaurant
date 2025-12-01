@@ -1,5 +1,5 @@
 ﻿
-/*using NUnit.Framework;
+using NUnit.Framework;
 using SushiRestaurant;
 using SushiRestaurant.Models;
 
@@ -105,4 +105,4 @@ namespace SushiRestaurantTests
             Assert.Throws<ArgumentNullException>(() => e.AssignMentor(null!));
         }
     }
-}*/
+}

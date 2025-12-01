@@ -45,10 +45,53 @@ public abstract class Employee : Person
             _baseSalary = value;
         }
     }
-    
+    [JsonIgnore]
        public abstract decimal Salary { get; }
-   
+
        public bool IsFullTime { get; protected set; }
+
+       private Employee? _mentor;
+
+       private readonly List<Employee> _mentees = new();
+
+       [JsonIgnore]
+       public Employee? Mentor => _mentor;
+
+       [JsonIgnore]
+       public IReadOnlyCollection<Employee> Mentees => _mentees.AsReadOnly();
+
+       public void AssignMentor(Employee mentor)
+       {
+           if (mentor is null)
+               throw new ArgumentNullException(nameof(mentor));
+
+           if (ReferenceEquals(mentor, this))
+               throw new InvalidOperationException("An employee cannot mentor themselves.");
+
+           if (mentor.GetType() != GetType())
+               throw new InvalidOperationException(
+                   "Mentor must have the same role (same concrete employee type).");
+
+           if (_mentor != null)
+           {
+               _mentor._mentees.Remove(this);
+           }
+
+           _mentor = mentor;
+
+           if (!mentor._mentees.Contains(this))
+               mentor._mentees.Add(this);
+       }
+
+       public void RemoveMentor()
+       {
+           if (_mentor == null)
+               return;
+
+           _mentor._mentees.Remove(this);
+           _mentor = null;
+       }
+
        private readonly List<Contract> _contracts = new();
        public IReadOnlyCollection<Contract> Contracts => _contracts.AsReadOnly();
    
