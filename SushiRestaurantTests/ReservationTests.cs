@@ -1,15 +1,21 @@
-﻿using System;
-using System.Linq;
-using NUnit.Framework;
-using SushiRestaurant;
+﻿using SushiRestaurant;
 
 namespace sushi_restaurant_tests
 {
     [TestFixture]
     public class ReservationTests
     {
-        private static Guest CreateGuest() =>
-            new Guest("Anna", "Nowak");
+        private static Guest CreateGuest(string first = "Anna", string last = "Nowak") =>
+            new Guest(first, last);
+
+        [SetUp]
+        public void SetUp()
+        {
+            Guest.ClearExtent();
+            Reservation.ClearExtent();
+            Order.ClearExtent();
+            Dish.ClearExtent();
+        }
 
         [Test]
         public void Should_Calculate_EndDateTime_As_Start_Plus_3_Hours()
@@ -104,6 +110,71 @@ namespace sushi_restaurant_tests
             Assert.That(reservation.Comment, Is.EqualTo("Perfect dinner experience!"));
             Assert.That(reservation.IsPaid, Is.True);
         }
+        
+        [Test]
+        public void Reservation_Created_With_Guest_Is_Associated_Both_Ways()
+        {
+            var guest = CreateGuest();
+            var reservation = new Reservation(
+                DateTime.Now.AddHours(2),
+                numberOfGuests: 2,
+                guest: guest);
+
+            Assert.That(reservation.Guest, Is.SameAs(guest));
+
+            Assert.That(guest.Reservations, Has.Count.EqualTo(1));
+            Assert.That(guest.Reservations.First(), Is.SameAs(reservation));
+        }
+
+        [Test]
+        public void ChangeGuest_Moves_Reservation_Between_Guests_And_Updates_Reverse()
+        {
+            var guest1 = CreateGuest("Anna", "Nowak");
+            var guest2 = CreateGuest("John", "Smith");
+
+            var reservation = new Reservation(
+                DateTime.Now.AddHours(2),
+                numberOfGuests: 2,
+                guest: guest1);
+
+            reservation.ChangeGuest(guest2);
+
+            Assert.That(reservation.Guest, Is.SameAs(guest2));
+
+            Assert.That(guest1.Reservations, Is.Empty);
+
+            Assert.That(guest2.Reservations, Has.Count.EqualTo(1));
+            Assert.That(guest2.Reservations.First(), Is.SameAs(reservation));
+        }
+
+        [Test]
+        public void ChangeGuest_With_Null_Should_Throw()
+        {
+            var guest1 = CreateGuest();
+            var reservation = new Reservation(
+                DateTime.Now.AddHours(2),
+                numberOfGuests: 2,
+                guest: guest1);
+
+            Assert.Throws<ArgumentNullException>(() => reservation.ChangeGuest(null!));
+        }
+
+        [Test]
+        public void ChangeGuest_To_Same_Guest_Does_Nothing()
+        {
+            var guest1 = CreateGuest();
+            var reservation = new Reservation(
+                DateTime.Now.AddHours(2),
+                numberOfGuests: 2,
+                guest: guest1);
+
+            reservation.ChangeGuest(guest1); 
+
+            Assert.That(reservation.Guest, Is.SameAs(guest1));
+            Assert.That(guest1.Reservations, Has.Count.EqualTo(1));
+            Assert.That(guest1.Reservations.First(), Is.SameAs(reservation));
+        }
+
 
         [Test]
         public void New_Reservation_Should_Have_Empty_Orders_Collection()
