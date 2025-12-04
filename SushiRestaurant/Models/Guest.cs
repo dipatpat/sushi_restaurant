@@ -30,10 +30,12 @@ public class Guest : Person
     }
     
     public LoyaltyCard? LoyaltyCard { get; set; }
-    private readonly List<Reservation> _reservations = new();
+    private readonly HashSet<Reservation> _reservations = new();
     
-    [JsonIgnore]
-    public IReadOnlyCollection<Reservation> Reservations => _reservations.AsReadOnly();
+    [JsonIgnore] 
+    public IReadOnlyCollection<Reservation> Reservations 
+        => _reservations.ToList().AsReadOnly();
+
     
     internal void InternalAddReservation(Reservation reservation)
     
@@ -41,6 +43,7 @@ public class Guest : Person
         if (reservation is null) throw new ArgumentNullException(nameof(reservation));
         if (!_reservations.Contains(reservation))
             _reservations.Add(reservation);
+        
     }
     
     internal void InternalRemoveReservation(Reservation reservation)
