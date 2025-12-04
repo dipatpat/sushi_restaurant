@@ -43,33 +43,7 @@ public class Reservation
         newGuest.InternalAddReservation(this);
     }
 
-    private Table _table = default!;
-    public Table Table => _table;
 
-    private void SetTable(Table table)
-    {
-        if (table is null)
-            throw new ArgumentNullException(nameof(table));
-
-        _table = table;
-        table.AddReservation(this);
-    }
-
-    public void ChangeTable(Table newTable)
-    {
-        if (newTable is null)
-            throw new ArgumentNullException(nameof(newTable));
-
-        if (ReferenceEquals(newTable, _table))
-            return;
-
-        var old = _table;
-        _table = newTable;
-
-        old.RemoveReservation(this);
-        newTable.AddReservation(this);
-    }
-    
     private DateTime _startDateTime;
     public DateTime StartDateTime
     {
@@ -187,13 +161,12 @@ public class Reservation
     }
 
 
-    public Reservation(DateTime startDateTime, int numberOfGuests, Guest guest, Table table)
+    public Reservation(DateTime startDateTime, int numberOfGuests, Guest guest)
     {
         StartDateTime = startDateTime;
         NumberOfGuests = numberOfGuests;
         SetGuest(guest);
-        SetTable(table);
-        
+
         _extent.Add(this);
         RegisterCostSnapshot();
     }

@@ -94,33 +94,33 @@ public abstract class Employee : Person
 
        private readonly List<Contract> _contracts = new();
        public IReadOnlyCollection<Contract> Contracts => _contracts.AsReadOnly();
-
-       public void AddContract(Contract contract)
-       {
+   
+       public void AddContract(Contract contract) {
+           
            if (contract == null)
                throw new ArgumentNullException(nameof(contract));
-           
+   
            if (_contracts.Contains(contract))
                throw new InvalidOperationException("This contract is already assigned to this employee.");
-
+   
            _contracts.Add(contract);
            
            if (contract.Employee != this)
                contract.SetEmployee(this);
        }
-
-       public void RemoveContract(Contract contract)
-       {
+   
+       public void RemoveContract(Contract contract) {
+           
            if (!_contracts.Contains(contract))
                throw new InvalidOperationException("This employee does not have this contract.");
+   
            if (_contracts.Count == 1)
                throw new InvalidOperationException("Employee must have at least one contract.");
-
+   
            _contracts.Remove(contract);
-           
+   
            if (contract.Employee == this)
-               throw new InvalidOperationException(
-                   "Contract cannot exist without an Employee. You must assign this contract to another employee before removing.");
+               contract.RemoveEmployee(this);
        }
        
     protected Employee(string firstName, string lastName, Address address,
