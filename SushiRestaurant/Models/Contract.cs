@@ -2,12 +2,12 @@
 
 public class Contract
 {
-    private Employee? _employee;
+    private Employee _employee;
 
     public Employee Employee
     {
-        get => _employee!;
-        private set => _employee = value;
+        get => _employee;
+        private set => _employee = value ?? throw new ArgumentNullException(nameof(Employee));
     }
 
     private DateTime _startDate;
@@ -33,32 +33,30 @@ public class Contract
             _endDate = value;
         }
     }
-
-    public Contract(DateTime startDate)
-    {
-        StartDate = startDate;
-    }
-
-    public void SetEmployee(Employee employee)
+    
+    public Contract(Employee employee, DateTime startDate)
     {
         if (employee == null)
             throw new ArgumentNullException(nameof(employee));
 
-        if (Employee != null)
-            throw new InvalidOperationException("This contract already has an employee.");
-
+        StartDate = startDate;
         Employee = employee;
         
         employee.AddContract(this);
     }
-
-    public void RemoveEmployee(Employee employee)
+    
+    public void SetEmployee(Employee newEmployee)
     {
-        if (Employee != employee)
-            throw new InvalidOperationException("This employee is not assigned to this contract.");
+        if (newEmployee == null)
+            throw new ArgumentNullException(nameof(newEmployee));
 
-        Employee = null;
+        if (_employee == newEmployee)
+            return;
 
-        employee.RemoveContract(this);
+        var oldEmployee = _employee;
+        _employee = newEmployee;
+        
+        oldEmployee.RemoveContract(this);
+        newEmployee.AddContract(this);
     }
 }
