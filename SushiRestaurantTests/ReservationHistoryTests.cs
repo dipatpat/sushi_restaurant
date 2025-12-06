@@ -22,7 +22,8 @@ namespace sushi_restaurant_tests
         public void New_Reservation_Has_Initial_TotalCostHistory_Entry_Zero()
         {
             var guest = CreateGuest();
-            var res = new Reservation(DateTime.Now.AddHours(3), 2, guest);
+            var table = new Table(3, 2);
+            var res = new Reservation(DateTime.Now.AddHours(3), 2, guest, table);
 
             Assert.That(res.TotalCostHistory.Count, Is.EqualTo(1));
             Assert.That(res.TotalCostHistory.First(), Is.EqualTo(0m));
@@ -32,7 +33,8 @@ namespace sushi_restaurant_tests
         public void Adding_And_Removing_Dishes_Produces_TotalCost_History_Bag()
         {
             var guest = CreateGuest();
-            var res   = new Reservation(DateTime.Now.AddHours(3), 2, guest);
+            var table = new Table(1, 4);
+            var res   = new Reservation(DateTime.Now.AddHours(3), 2, guest, table);
             var order = new Order(res);
 
             var d1 = new Dish("Miso Soup", 10m, DishType.Starter);

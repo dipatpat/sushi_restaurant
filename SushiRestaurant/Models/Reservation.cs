@@ -42,6 +42,37 @@ public class Reservation
         oldGuest.InternalRemoveReservation(this);
         newGuest.InternalAddReservation(this);
     }
+    
+    private Table _table = default!;
+    public Table Table => _table;
+
+    private void SetTable(Table table)
+    {
+        if (table is null)
+            throw new ArgumentNullException(nameof(table));
+        
+        if (_table != null && _table != table)
+            throw new InvalidOperationException("This reservation is already assigned to another table.");
+
+        _table = table;
+        
+        table.AddReservation(this);
+    }
+
+    public void ChangeTable(Table newTable)
+    {
+        if (newTable is null)
+            throw new ArgumentNullException(nameof(newTable));
+
+        if (ReferenceEquals(newTable, _table))
+            return; 
+
+        var oldTable = _table;
+        _table = newTable;
+        
+        oldTable.RemoveReservation(this);
+        newTable.AddReservation(this);
+    }
 
 
     private DateTime _startDateTime;
@@ -161,7 +192,7 @@ public class Reservation
     }
 
 
-    public Reservation(DateTime startDateTime, int numberOfGuests, Guest guest)
+    public Reservation(DateTime startDateTime, int numberOfGuests, Guest guest, Table table)
     {
         StartDateTime = startDateTime;
         NumberOfGuests = numberOfGuests;

@@ -18,11 +18,15 @@ public class Program
         {
             var g1 = new Guest("Charlie", "Brown", "Chuck");
             var g2 = new Guest("Lucy", "Van Pelt");
+            var t1 = new Table(1, 4);
+            var t2 = new Table(2, 6);
+            var t3 = new Table(3, 2);
 
             var res = new Reservation(
                 DateTime.Now.AddDays(7).Date.AddHours(19),
                 numberOfGuests: 4,
-                guest: g1)
+                guest: g1,
+                table: t1)
             {
                 IsPaid = true,
                 ReviewScore = 5
@@ -102,5 +106,7 @@ public class Program
 
         FullTimeCleaner.ClearExtent();
         PartTimeCleaner.ClearExtent();
+        
+        Table.ClearExtent();
     }
 }

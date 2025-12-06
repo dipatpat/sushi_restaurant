@@ -22,10 +22,12 @@ namespace sushi_restaurant_tests
                 LastName = "Sato",
                 Nickname = "SushiQueen"
             };
+            var table = new Table(3, 2);
             return new Reservation(
                 DateTime.Now.AddHours(2),  
                 numberOfGuests: 2,
-                guest: guest
+                guest: guest,
+                table: table
             )
             {
                 Comment = $"Res-{label}"

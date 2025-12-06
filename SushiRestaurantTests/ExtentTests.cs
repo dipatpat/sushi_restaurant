@@ -40,7 +40,8 @@ namespace sushi_restaurant_tests
             var addr = CreateTestAddress();
 
             var guest = new Guest("Charlie", "Brown");
-            var reservation = new Reservation(DateTime.Today.AddHours(19), 4, guest);
+            var table = new Table(1, 4);
+            var reservation = new Reservation(DateTime.Today.AddHours(19), 4, guest,table);
 
             var ftManager = new FullTimeManager("Alice", "Smith", addr, "PL001", "555-111-222",
                                                 7500m, SeniorityLevel.Senior, vacationDays: 25);
@@ -89,7 +90,8 @@ namespace sushi_restaurant_tests
                 var reservationStart = DateTime.Today.AddDays(7).AddHours(19);
 
                 var guest = new Guest("Charlie", "Brown", "Chuck");
-                var reservation = new Reservation(reservationStart, 4, guest)
+                var table = new Table(1, 4);
+                var reservation = new Reservation(reservationStart, 4, guest,table)
                 {
                     IsPaid = true,
                     ReviewScore = 5

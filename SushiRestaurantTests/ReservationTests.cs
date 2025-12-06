@@ -115,10 +115,12 @@ namespace sushi_restaurant_tests
         public void Reservation_Created_With_Guest_Is_Associated_Both_Ways()
         {
             var guest = CreateGuest();
+            var table = new Table(3, 2);
             var reservation = new Reservation(
                 DateTime.Now.AddHours(2),
                 numberOfGuests: 2,
-                guest: guest);
+                guest: guest,
+                table: table);
 
             Assert.That(reservation.Guest, Is.SameAs(guest));
 
@@ -131,11 +133,13 @@ namespace sushi_restaurant_tests
         {
             var guest1 = CreateGuest("Anna", "Nowak");
             var guest2 = CreateGuest("John", "Smith");
+            var table = new Table(3, 2);
 
             var reservation = new Reservation(
                 DateTime.Now.AddHours(2),
                 numberOfGuests: 2,
-                guest: guest1);
+                guest: guest1,
+                table: table);
 
             reservation.ChangeGuest(guest2);
 
@@ -151,10 +155,12 @@ namespace sushi_restaurant_tests
         public void ChangeGuest_With_Null_Should_Throw()
         {
             var guest1 = CreateGuest();
+            var table = new Table(3, 2);
             var reservation = new Reservation(
                 DateTime.Now.AddHours(2),
                 numberOfGuests: 2,
-                guest: guest1);
+                guest: guest1,
+                table: table);
 
             Assert.Throws<ArgumentNullException>(() => reservation.ChangeGuest(null!));
         }
@@ -163,10 +169,12 @@ namespace sushi_restaurant_tests
         public void ChangeGuest_To_Same_Guest_Does_Nothing()
         {
             var guest1 = CreateGuest();
+            var table = new Table(3, 2);
             var reservation = new Reservation(
                 DateTime.Now.AddHours(2),
                 numberOfGuests: 2,
-                guest: guest1);
+                guest: guest1,
+                table: table);
 
             reservation.ChangeGuest(guest1); 
 
@@ -188,10 +196,12 @@ namespace sushi_restaurant_tests
         public void Creating_Order_For_Reservation_Adds_It_To_Orders_Collection()
         {
             var guest = CreateGuest();
+            var table = new Table(3, 2);
             var reservation = new Reservation(
                 DateTime.Now.AddHours(2),
                 numberOfGuests: 2,
-                guest: guest);
+                guest: guest,
+                table: table);
 
             var order = new Order(reservation);
 
@@ -203,10 +213,12 @@ namespace sushi_restaurant_tests
         public void GetTotalCost_Should_Sum_OrderSums_For_All_Orders()
         {
             var guest = CreateGuest();
+            var table = new Table(3, 2);
             var reservation = new Reservation(
                 DateTime.Now.AddHours(2),
                 numberOfGuests: 2,
-                guest: guest);
+                guest: guest,
+                table: table);
 
             var order1 = new Order(reservation);
             var order2 = new Order(reservation);

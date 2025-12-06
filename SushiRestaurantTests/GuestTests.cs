@@ -54,11 +54,12 @@ namespace sushi_restaurant_tests
         public void Creating_Reservation_Associates_It_With_Guest_And_Updates_Reverse()
         {
             var guest = new Guest("Anna", "Nowak");
-
+            var table = new Table(3, 2);
             var reservation = new Reservation(
                 DateTime.Now.AddHours(3),
                 numberOfGuests: 2,
-                guest: guest);
+                guest: guest,
+                table: table);
 
             Assert.That(reservation.Guest, Is.SameAs(guest));
 
