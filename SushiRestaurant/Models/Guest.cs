@@ -36,13 +36,27 @@ public class Guest : Person
     public IReadOnlyCollection<Reservation> Reservations 
         => _reservations.ToList().AsReadOnly();
 
-    
+    public void AddReservation(Reservation reservation)
+    {
+        if  (reservation is null)
+            throw new ArgumentNullException(nameof(reservation));
+        
+        //add locally
+        bool added = _reservations.Add(reservation);
+        
+        //reverse connection
+        if (!ReferenceEquals(reservation.Guest, this))
+        {
+            reservation.InternalSetGuestFromGuest(this);
+        }
+    }
     internal void InternalAddReservation(Reservation reservation)
     
     {
-        if (reservation is null) throw new ArgumentNullException(nameof(reservation));
-        if (!_reservations.Contains(reservation))
-            _reservations.Add(reservation);
+        if (reservation is null) 
+            throw new ArgumentNullException(nameof(reservation));
+        
+        _reservations.Add(reservation);
         
     }
     
