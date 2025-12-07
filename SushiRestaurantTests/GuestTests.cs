@@ -113,5 +113,38 @@ namespace sushi_restaurant_tests
             });
         }
         
+        [Test]
+        public void ChangeGuest_From_Guest_Side_Updates_Both_Sides()
+        {
+            var oldGuest = new Guest("Anna", "Nowak");
+            var newGuest = new Guest("John", "Smith");
+            var table = new Table(1, 2);
+
+            var reservation = new Reservation(
+                DateTime.Now.AddHours(3),
+                numberOfGuests: 2,
+                guest: oldGuest,
+                table: table);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(reservation.Guest, Is.SameAs(oldGuest));
+                Assert.That(oldGuest.Reservations, Has.Count.EqualTo(1));
+                Assert.That(newGuest.Reservations, Is.Empty);
+            });
+
+            newGuest.TakeOverReservation(reservation);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(reservation.Guest, Is.SameAs(newGuest));
+
+                Assert.That(oldGuest.Reservations, Is.Empty);
+
+                Assert.That(newGuest.Reservations, Has.Count.EqualTo(1));
+                Assert.That(newGuest.Reservations.Single(), Is.SameAs(reservation));
+            });
+        }
+        
     }
 }
