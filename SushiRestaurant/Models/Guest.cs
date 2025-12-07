@@ -80,6 +80,23 @@ public class Guest : Person
         if (reservation is null) throw new ArgumentNullException(nameof(reservation));
         _reservations.Remove(reservation);
     }
+
+    public void RemoveReservation(Reservation reservation)
+    {
+        if (reservation is null)
+            throw new ArgumentNullException(nameof(reservation));
+        
+        bool removed = _reservations.Remove(reservation);
+        if (!removed)
+        {
+            return;
+        }
+
+        if (ReferenceEquals(reservation.Guest, this))
+        {
+            reservation.InternalRemoveGuestFromGuest(this);
+        }
+    }
     
     public SushiRestaurant.Models.LoyaltyCard CreateLoyaltyCard(
         string email, 

@@ -62,6 +62,23 @@ public class Reservation
 
         newGuest.InternalAddReservation(this);
     }
+
+    public void RemoveGuest()
+    {
+        var oldGuest = _guest;
+        if (oldGuest is null)
+            return;
+        
+        oldGuest.InternalRemoveReservation(this);
+        _guest = null;
+    }
+
+    internal void InternalRemoveGuestFromGuest(Guest guest)
+    {
+        if (!ReferenceEquals(guest, _guest))
+            return;
+        _guest = null;
+    }
     
     private Table _table = default!;
     public Table Table => _table;
