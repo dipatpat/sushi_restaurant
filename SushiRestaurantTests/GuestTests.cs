@@ -51,6 +51,8 @@ namespace sushi_restaurant_tests
         }
 
         [Test]
+        //Reservation constructor takes a Guest and should set reservation.Gest and add
+        //the reservation to guest.Reservations (reverse connection)
         public void Creating_Reservation_Associates_It_With_Guest_And_Updates_Reverse()
         {
             var guest = new Guest("Anna", "Nowak");
@@ -66,5 +68,50 @@ namespace sushi_restaurant_tests
             Assert.That(guest.Reservations, Has.Count.EqualTo(1));
             Assert.That(guest.Reservations.First(), Is.SameAs(reservation));
         }
+
+        [Test]
+        public void AddReservation_From_Guest_Side_Updates_Reverse_Connection()
+        {
+            var guest = new Guest("Anna", "Nowak");
+
+            var reservation = new Reservation();
+            reservation.StartDateTime = DateTime.Now.AddHours(3);
+            reservation.NumberOfGuests = 2;
+
+            guest.AddReservation(reservation);
+
+            Assert.Multiple(() =>
+            {
+                // forward: reservation.Guest was updated by reverse connection
+                Assert.That(reservation.Guest, Is.SameAs(guest));
+
+                // reverse: guest.Reservations now contains reservation
+                Assert.That(guest.Reservations, Has.Count.EqualTo(1));
+                Assert.That(guest.Reservations.Contains(reservation), Is.True);
+            });
+        }
+        
+        [Test]
+        public void AddReservation_Should_Not_Duplicate_The_Same_Reservation()
+        {
+            var guest = new Guest("Anna", "Nowak");
+
+            var reservation = new Reservation
+            {
+                StartDateTime = DateTime.Now.AddHours(3),
+                NumberOfGuests = 2
+            };
+
+            guest.AddReservation(reservation);
+            guest.AddReservation(reservation); 
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(guest.Reservations, Has.Count.EqualTo(1));
+                Assert.That(guest.Reservations.Single(), Is.SameAs(reservation));
+                Assert.That(reservation.Guest, Is.SameAs(guest));
+            });
+        }
+        
     }
 }
