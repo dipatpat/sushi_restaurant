@@ -53,9 +53,13 @@ public class Reservation
             return;
 
         var oldGuest = _guest;
+
+        if (oldGuest is not null)
+        {
+            oldGuest.InternalRemoveReservation(this);
+        }
         _guest = newGuest;
 
-        oldGuest.InternalRemoveReservation(this);
         newGuest.InternalAddReservation(this);
     }
     

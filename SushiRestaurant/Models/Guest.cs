@@ -40,7 +40,14 @@ public class Guest : Person
     {
         if  (reservation is null)
             throw new ArgumentNullException(nameof(reservation));
-        
+
+        if (!ReferenceEquals(reservation.Guest, null) &&
+            !ReferenceEquals(reservation.Guest, this))
+        {
+            this.TakeOverReservation(reservation);
+            return;
+        }
+
         //add locally
         bool added = _reservations.Add(reservation);
         
@@ -49,6 +56,14 @@ public class Guest : Person
         {
             reservation.InternalSetGuestFromGuest(this);
         }
+    }
+
+    public void TakeOverReservation(Reservation reservation)
+    {
+        if (reservation is null)
+            throw new ArgumentNullException(nameof(reservation));
+        
+        reservation.ChangeGuest(this);
     }
     internal void InternalAddReservation(Reservation reservation)
     
