@@ -127,28 +127,72 @@ namespace sushi_restaurant_tests
             Assert.That(guest.Reservations, Has.Count.EqualTo(1));
             Assert.That(guest.Reservations.First(), Is.SameAs(reservation));
         }
-
+        
         [Test]
-        public void ChangeGuest_Moves_Reservation_Between_Guests_And_Updates_Reverse()
+        public void ChangeGuest_From_Guest_Side_Updates_Both_Sides()
         {
-            var guest1 = CreateGuest("Anna", "Nowak");
-            var guest2 = CreateGuest("John", "Smith");
-            var table = new Table(3, 2);
+            var oldGuest = new Guest("Anna", "Nowak");
+            var newGuest = new Guest("John", "Smith");
+            var table = new Table(1, 2);
 
             var reservation = new Reservation(
-                DateTime.Now.AddHours(2),
+                DateTime.Now.AddHours(3),
                 numberOfGuests: 2,
-                guest: guest1,
+                guest: oldGuest,
                 table: table);
 
-            reservation.ChangeGuest(guest2);
+            Assert.Multiple(() =>
+            {
+                Assert.That(reservation.Guest, Is.SameAs(oldGuest));
+                Assert.That(oldGuest.Reservations, Has.Count.EqualTo(1));
+                Assert.That(newGuest.Reservations, Is.Empty);
+            });
 
-            Assert.That(reservation.Guest, Is.SameAs(guest2));
+            newGuest.TakeOverReservation(reservation);
 
-            Assert.That(guest1.Reservations, Is.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(reservation.Guest, Is.SameAs(newGuest));
 
-            Assert.That(guest2.Reservations, Has.Count.EqualTo(1));
-            Assert.That(guest2.Reservations.First(), Is.SameAs(reservation));
+                Assert.That(oldGuest.Reservations, Is.Empty);
+
+                Assert.That(newGuest.Reservations, Has.Count.EqualTo(1));
+                Assert.That(newGuest.Reservations.Single(), Is.SameAs(reservation));
+            });
+        }
+
+        [Test]
+        public void ChangeGuest_From_Reservation_Side_Updates_Both_Sides()
+        {
+            var oldGuest = new Guest("Anna", "Nowak");
+            var newGuest = new Guest("John", "Smith");
+            var table = new Table(1, 2);
+
+            var reservation = new Reservation(
+                DateTime.Now.AddHours(3),
+                numberOfGuests: 2,
+                guest: oldGuest,
+                table: table);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(reservation.Guest, Is.SameAs(oldGuest));
+                Assert.That(oldGuest.Reservations, Has.Count.EqualTo(1));
+                Assert.That(oldGuest.Reservations.Single(), Is.SameAs(reservation));
+                Assert.That(newGuest.Reservations, Is.Empty);
+            });
+
+            reservation.ChangeGuest(newGuest);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(reservation.Guest, Is.SameAs(newGuest));
+
+                Assert.That(oldGuest.Reservations, Is.Empty);
+
+                Assert.That(newGuest.Reservations, Has.Count.EqualTo(1));
+                Assert.That(newGuest.Reservations.Single(), Is.SameAs(reservation));
+            });
         }
 
         [Test]
@@ -182,6 +226,29 @@ namespace sushi_restaurant_tests
             Assert.That(guest1.Reservations, Has.Count.EqualTo(1));
             Assert.That(guest1.Reservations.First(), Is.SameAs(reservation));
         }
+        
+        [Test]
+        public void AddReservation_On_Same_Guest_Does_Not_Duplicate()
+        {
+            var guest = new Guest("Anna", "Nowak");
+            var table = new Table(1, 2);
+
+            var reservation = new Reservation(
+                DateTime.Now.AddHours(3),
+                numberOfGuests: 2,
+                guest: guest,
+                table: table);
+
+            guest.AddReservation(reservation);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(guest.Reservations, Has.Count.EqualTo(1));
+                Assert.That(guest.Reservations.Single(), Is.SameAs(reservation));
+                Assert.That(reservation.Guest, Is.SameAs(guest));
+            });
+        }
+    
 
 
         [Test]
@@ -233,5 +300,8 @@ namespace sushi_restaurant_tests
             Assert.That(reservation.GetTotalCost(), Is.EqualTo(expectedTotal));
             Assert.That(reservation.TotalCost, Is.EqualTo(expectedTotal));
         }
+        
+        
+        }
     }
-}
+
