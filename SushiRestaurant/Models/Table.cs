@@ -27,7 +27,7 @@ public class Table
         _extent.Add(this);
     }
 
-    internal void AddReservation(Reservation reservation)
+    public void AddReservation(Reservation reservation)
     {
         if (reservation == null)
             throw new ArgumentNullException(nameof(reservation));
@@ -41,7 +41,7 @@ public class Table
         _reservations.Add(reservation);
     }
 
-    internal void RemoveReservation(Reservation reservation)
+    public void RemoveReservation(Reservation reservation)
     {
         if (reservation == null)
             throw new ArgumentNullException(nameof(reservation));

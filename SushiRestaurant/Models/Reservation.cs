@@ -197,6 +197,7 @@ public class Reservation
         StartDateTime = startDateTime;
         NumberOfGuests = numberOfGuests;
         SetGuest(guest);
+        SetTable(table);
 
         _extent.Add(this);
         RegisterCostSnapshot();
