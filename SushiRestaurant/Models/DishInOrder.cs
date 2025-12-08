@@ -30,6 +30,9 @@ public class DishInOrder
         Quantity = quantity;
         TimeOrdered = DateTime.Now;
 
+        order.InternalAddDishInOrder(this);
+        dish.InternalAddDishInOrder(this);
+
         _extent.Add(this);
     }
 
@@ -40,5 +43,15 @@ public class DishInOrder
                 "Quantity must be positive.");
 
         Quantity = newQuantity;
+
+        Order.NotifyItemsChanged();
+    }
+
+    public void Remove()
+    {
+        _order.InternalRemoveDishInOrder(this);
+        _dish.InternalRemoveDishInOrder(this);
+
+        _extent.Remove(this);
     }
 }

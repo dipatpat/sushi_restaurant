@@ -53,37 +53,65 @@ public class Order
         _extent.Remove(this);
     }
 
+    private readonly HashSet<DishInOrder> _items = new();
+    
+    [JsonIgnore]
+    public IReadOnlyCollection<DishInOrder> Items => _items.ToList().AsReadOnly();
 
-    private readonly List<Dish> _dishes = new();
-    public IReadOnlyCollection<Dish> Dishes => _dishes.AsReadOnly();
-
-    public void AddItemToOrder(Dish dish)
+    internal void InternalAddDishInOrder(DishInOrder item)
     {
-        if (dish == null)
-            throw new ArgumentNullException(nameof(dish));
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
 
-        if (Status == OrderStatus.Canceled || Status == OrderStatus.Completed)
-            throw new InvalidOperationException("Cannot add items to canceled/completed orders.");
+        _items.Add(item);
+        NotifyItemsChanged();
+    }
 
-        _dishes.Add(dish);
+    internal void InternalRemoveDishInOrder(DishInOrder item)
+    {
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+        _items.Remove(item);
+        NotifyItemsChanged();
+    }
+
+    internal void NotifyItemsChanged()
+    {
         _reservation.RegisterCostSnapshot();
     }
 
-    public bool RemoveItemFromOrder(Dish dish)
+    public void RemoveItemFromOrder(DishInOrder item)
     {
-        if (dish == null)
-            throw new ArgumentNullException(nameof(dish));
-        var  removed = _dishes.Remove(dish);
-        if (removed)
+        if (item is null)
         {
-            _reservation.RegisterCostSnapshot();
+            throw new ArgumentNullException(nameof(item));
         }
-
-        return removed;
+        item.Remove();
     }
 
+    public DishInOrder AddItemToOrder(Dish dish, int quantity)
+    {
+        if (dish is null)
+        {
+            throw new ArgumentNullException(nameof(dish));
+        }
+
+        if (Status is OrderStatus.Canceled or OrderStatus.Completed)
+        {
+            throw new InvalidOperationException("Cannot add an item to canceled or completed orders.");
+        }
+
+        return new DishInOrder(dish, this, quantity);
+    }
+
+   
+
     [JsonIgnore]
-    public decimal OrderSum => _dishes.Sum(d => d.Price);
+    public decimal OrderSum => _items.Sum(i => i.Dish.Price * i.Quantity);
 
 
     public DateTime CreatedAt { get; private set; }

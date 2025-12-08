@@ -1,4 +1,5 @@
 namespace SushiRestaurant;
+using System.Text.Json.Serialization;
 
 public enum DishType
 {
@@ -55,7 +56,7 @@ public class Dish
     public DishType DishType { get; set; }
 
     private readonly HashSet<Ingredient> _ingredients = new HashSet<Ingredient>();
-
+    private readonly HashSet<DishInOrder> _dishInOrders = new();
     public Dish(string name, decimal price, DishType type)
     {
         DishName = name;
@@ -119,5 +120,36 @@ public class Dish
         {
             Console.WriteLine($"{dish.DishName} — {dish.Price:C} ({dish.DishType})");
         }
+    }
+    
+    
+    [JsonIgnore]
+    public IReadOnlyCollection<DishInOrder> DishInOrders => _dishInOrders.ToList().AsReadOnly();
+
+    internal void InternalAddDishInOrder(DishInOrder item)
+    {
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+        _dishInOrders.Add(item);
+    }
+
+    internal void InternalRemoveDishInOrder(DishInOrder item)
+    {
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+        _dishInOrders.Remove(item);
+    }
+
+    public DishInOrder AddToOrder(Order order, int quantity)
+    {
+        if (order is null)
+        {
+            throw new ArgumentNullException(nameof(order));
+        }
+        return new DishInOrder(this, order, quantity);
     }
 }
