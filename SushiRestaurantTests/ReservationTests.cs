@@ -217,9 +217,7 @@ namespace sushi_restaurant_tests
                 Assert.That(reservation.Guest, Is.SameAs(guest));
             });
         }
-    
-
-
+        
         [Test]
         public void New_Reservation_Should_Have_Empty_Orders_Collection()
         {
@@ -258,11 +256,16 @@ namespace sushi_restaurant_tests
 
             var order1 = new Order(reservation);
             var order2 = new Order(reservation);
+            
+            var dish1 = new Dish("Miso Soup", 10m, DishType.Starter);
+            var dish2 = new Dish("Green Tea", 5m, DishType.Drink);
+            var dish3 = new Dish("Salmon Nigiri", 20m, DishType.Sushi);
+            
 
-            order1.AddItemToOrder(new Dish("Miso Soup", 10m, DishType.Starter));
-            order1.AddItemToOrder(new Dish("Green Tea", 5m, DishType.Drink));
+           order1.AddItemToOrder(dish1, 1);
+           order1.AddItemToOrder(dish2, 1);
+           order2.AddItemToOrder(dish3, 1);
 
-            order2.AddItemToOrder(new Dish("Salmon Nigiri", 20m, DishType.Sushi));
 
             var expectedTotal = 10m + 5m + 20m;
 
