@@ -4,6 +4,8 @@ public class SushiDto
 {
     public List<Guest> Guests { get; set; } = new();
     public List<Reservation> Reservations { get; set; } = new();
+    public List<Order> Orders { get; set; } = new();                 // NEW
+    public List<DishInOrder> DishInOrders { get; set; } = new();     // NEW
 
     public List<FullTimeWaiter> FullTimeWaiters { get; set; } = new();
     public List<PartTimeWaiter> PartTimeWaiters { get; set; } = new();
