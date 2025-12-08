@@ -59,7 +59,12 @@ public class Dish
 
     private readonly HashSet<Ingredient> _ingredients = new HashSet<Ingredient>();
     private readonly HashSet<DishInOrder> _dishInOrdersItems = new();
+    
+    [JsonIgnore]
+    public IReadOnlyCollection<DishInOrder> ActiveDishInOrderItems =>
+        _dishInOrdersItems.Where(i => i.IsActive).ToList().AsReadOnly();
 
+    [JsonIgnore] public IReadOnlyCollection<DishInOrder> AllDishInOrders => _dishInOrdersItems.ToList().AsReadOnly();
     public Dish(string name, decimal price, DishType type)
     {
         DishName = name;
@@ -170,7 +175,7 @@ public class Dish
             throw new InvalidOperationException("This DishInOrder does not belong to this dish.");
         }
 
-        item.Remove();
+        item.Deactivate();
     }
 
 }

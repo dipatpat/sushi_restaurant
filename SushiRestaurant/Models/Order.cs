@@ -56,8 +56,10 @@ public class Order
     private readonly HashSet<DishInOrder> _dishInOrderItems = new();
     
     [JsonIgnore]
-    public IReadOnlyCollection<DishInOrder> DishInOrderItems => _dishInOrderItems.ToList().AsReadOnly();
-
+    public IReadOnlyCollection<DishInOrder> ActiveDishInOrderItems => _dishInOrderItems.Where(i => i.IsActive).ToList().AsReadOnly();
+    
+    [JsonIgnore]
+    public IReadOnlyCollection<DishInOrder> AllDishInOrderItems => _dishInOrderItems.ToList().AsReadOnly();
     internal void InternalAddDishInOrder(DishInOrder item)
     {
         if (item is null)
@@ -90,7 +92,9 @@ public class Order
         {
             throw new ArgumentNullException(nameof(item));
         }
-        item.Remove();
+        if (!ReferenceEquals(item.Order, this))
+            throw new InvalidOperationException("This DishInOrder doesn't belong to this order.");
+        item.Deactivate();
     }
 
     public DishInOrder AddItemToOrder(Dish dish, int quantity)
@@ -111,7 +115,9 @@ public class Order
    
 
     [JsonIgnore]
-    public decimal OrderSum => _dishInOrderItems.Sum(i => i.Dish.Price * i.Quantity);
+    public decimal OrderSum => _dishInOrderItems
+        .Where(i => i.IsActive)
+        .Sum(i => i.Dish.Price * i.Quantity);
 
 
     public DateTime CreatedAt { get; private set; }

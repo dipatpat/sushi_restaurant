@@ -156,9 +156,9 @@ namespace sushi_restaurant_tests
 
             Assert.Multiple(() =>
             {
-                Assert.That(order.DishInOrderItems.Count, Is.EqualTo(2));
-                Assert.That(order.DishInOrderItems.Select(i => i.Dish), Does.Contain(d1));
-                Assert.That(order.DishInOrderItems.Select(i => i.Dish), Does.Contain(d2));
+                Assert.That(order.ActiveDishInOrderItems.Count, Is.EqualTo(2));
+                Assert.That(order.ActiveDishInOrderItems.Select(i => i.Dish), Does.Contain(d1));
+                Assert.That(order.ActiveDishInOrderItems.Select(i => i.Dish), Does.Contain(d2));
 
                 Assert.That(order.OrderSum, Is.EqualTo(15m));
             });
@@ -194,8 +194,8 @@ namespace sushi_restaurant_tests
 
             Assert.Multiple(() =>
             {
-                Assert.That(order.DishInOrderItems.Count, Is.EqualTo(1));
-                Assert.That(order.DishInOrderItems.First(), Is.SameAs(i2));
+                Assert.That(order.ActiveDishInOrderItems.Count, Is.EqualTo(1));
+                Assert.That(order.ActiveDishInOrderItems.First(), Is.SameAs(i2));
 
                 Assert.That(order.OrderSum, Is.EqualTo(5m));
             });

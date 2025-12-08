@@ -47,8 +47,8 @@ namespace sushi_restaurant_tests
                 Assert.That(item.Dish, Is.SameAs(dish));
                 Assert.That(item.Quantity, Is.EqualTo(3));
 
-                Assert.That(order.DishInOrderItems, Has.Count.EqualTo(1));
-                Assert.That(order.DishInOrderItems.Single(), Is.SameAs(item));
+                Assert.That(order.ActiveDishInOrderItems, Has.Count.EqualTo(1));
+                Assert.That(order.ActiveDishInOrderItems.Single(), Is.SameAs(item));
 
                 Assert.That(dish.DishInOrdersItems, Has.Count.EqualTo(1));
                 Assert.That(dish.DishInOrdersItems.Single(), Is.SameAs(item));
@@ -69,7 +69,7 @@ namespace sushi_restaurant_tests
                 Assert.That(item.Dish, Is.SameAs(dish));
                 Assert.That(item.Quantity, Is.EqualTo(2));
 
-                Assert.That(order.DishInOrderItems.Single(), Is.SameAs(item));
+                Assert.That(order.ActiveDishInOrderItems.Single(), Is.SameAs(item));
                 Assert.That(dish.DishInOrdersItems.Single(), Is.SameAs(item));
             });
         }
@@ -88,8 +88,8 @@ namespace sushi_restaurant_tests
                 Assert.That(item.Dish, Is.SameAs(dish));
                 Assert.That(item.Quantity, Is.EqualTo(2));
 
-                Assert.That(order.DishInOrderItems, Has.Count.EqualTo(1));
-                Assert.That(order.DishInOrderItems.Single(), Is.SameAs(item));
+                Assert.That(order.ActiveDishInOrderItems, Has.Count.EqualTo(1));
+                Assert.That(order.ActiveDishInOrderItems.Single(), Is.SameAs(item));
 
                 Assert.That(dish.DishInOrdersItems, Has.Count.EqualTo(1));
                 Assert.That(dish.DishInOrdersItems.Single(), Is.SameAs(item));
@@ -106,11 +106,11 @@ namespace sushi_restaurant_tests
             var dish = CreateSampleDish();
             var item = order.AddItemToOrder(dish, 1);
 
-            item.Remove();
+            item.RemoveCompletely();
 
             Assert.Multiple(() =>
             {
-                Assert.That(order.DishInOrderItems, Is.Empty);
+                Assert.That(order.ActiveDishInOrderItems, Is.Empty);
                 Assert.That(dish.DishInOrdersItems, Is.Empty);
                 Assert.That(DishInOrder.Extent, Is.Empty);
             });
@@ -127,7 +127,7 @@ namespace sushi_restaurant_tests
 
             Assert.Multiple(() =>
             {
-                Assert.That(order.DishInOrderItems, Is.Empty);
+                Assert.That(order.ActiveDishInOrderItems, Is.Empty);
                 Assert.That(dish.DishInOrdersItems, Is.Empty);
                 Assert.That(DishInOrder.Extent, Is.Empty);
             });
@@ -144,7 +144,7 @@ namespace sushi_restaurant_tests
 
             Assert.Multiple(() =>
             {
-                Assert.That(order.DishInOrderItems, Is.Empty);
+                Assert.That(order.ActiveDishInOrderItems, Is.Empty);
                 Assert.That(dish.DishInOrdersItems, Is.Empty);
                 Assert.That(DishInOrder.Extent, Is.Empty);
             });
