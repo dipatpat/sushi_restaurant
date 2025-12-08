@@ -1,4 +1,7 @@
+using NUnit.Framework;
 using SushiRestaurant;
+using System;
+using System.Linq;
 
 namespace sushi_restaurant_tests
 {
@@ -11,8 +14,9 @@ namespace sushi_restaurant_tests
             Order.ClearExtent();
             Reservation.ClearExtent();
             Dish.ClearExtent();
+            DishInOrder.ClearExtent();
+            Guest.ClearExtent();
         }
-
 
         private static Reservation CreateReservation(string label = "A")
         {
@@ -23,8 +27,9 @@ namespace sushi_restaurant_tests
                 Nickname = "SushiQueen"
             };
             var table = new Table(3, 2);
+
             return new Reservation(
-                DateTime.Now.AddHours(2),  
+                DateTime.Now.AddHours(2),
                 numberOfGuests: 2,
                 guest: guest,
                 table: table
@@ -39,21 +44,25 @@ namespace sushi_restaurant_tests
             return new Dish(name, price, type);
         }
 
+        // ------------------------------------------------------------
+        // ORDER CREATION TESTS
+        // ------------------------------------------------------------
+
         [Test]
         public void Creating_Order_Associates_With_Reservation_And_Updates_Reverse()
         {
             var res = CreateReservation("A");
-
             var order = new Order(res);
 
-          
-            Assert.That(order.Reservation, Is.SameAs(res));
+            Assert.Multiple(() =>
+            {
+                Assert.That(order.Reservation, Is.SameAs(res));
+                Assert.That(res.Orders, Has.Count.EqualTo(1));
+                Assert.That(res.Orders.First(), Is.SameAs(order));
 
-            Assert.That(res.Orders, Has.Count.EqualTo(1));
-            Assert.That(res.Orders.First(), Is.SameAs(order));
-
-            Assert.That(Order.Extent, Has.Count.EqualTo(1));
-            Assert.That(Order.Extent[0], Is.SameAs(order));
+                Assert.That(Order.Extent, Has.Count.EqualTo(1));
+                Assert.That(Order.Extent[0], Is.SameAs(order));
+            });
         }
 
         [Test]
@@ -61,6 +70,10 @@ namespace sushi_restaurant_tests
         {
             Assert.Throws<ArgumentNullException>(() => new Order(null!));
         }
+
+        // ------------------------------------------------------------
+        // CHANGE RESERVATION
+        // ------------------------------------------------------------
 
         [Test]
         public void ChangeReservation_Moves_Order_Between_Reservations()
@@ -71,12 +84,15 @@ namespace sushi_restaurant_tests
 
             order.ChangeReservation(res2);
 
-            Assert.That(order.Reservation, Is.SameAs(res2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(order.Reservation, Is.SameAs(res2));
 
-            Assert.That(res1.Orders, Is.Empty);
+                Assert.That(res1.Orders, Is.Empty);
 
-            Assert.That(res2.Orders, Has.Count.EqualTo(1));
-            Assert.That(res2.Orders.First(), Is.SameAs(order));
+                Assert.That(res2.Orders, Has.Count.EqualTo(1));
+                Assert.That(res2.Orders.First(), Is.SameAs(order));
+            });
         }
 
         [Test]
@@ -94,12 +110,18 @@ namespace sushi_restaurant_tests
             var res = CreateReservation("A");
             var order = new Order(res);
 
-            order.ChangeReservation(res);   
+            order.ChangeReservation(res);
 
-            Assert.That(order.Reservation, Is.SameAs(res));
-            Assert.That(res.Orders, Has.Count.EqualTo(1));
-            Assert.That(res.Orders.First(), Is.SameAs(order));
+            Assert.Multiple(() =>
+            {
+                Assert.That(order.Reservation, Is.SameAs(res));
+                Assert.That(res.Orders.Count, Is.EqualTo(1));
+            });
         }
+
+        // ------------------------------------------------------------
+        // REMOVE ORDER
+        // ------------------------------------------------------------
 
         [Test]
         public void Remove_Removes_Order_From_Reservation_And_Extent()
@@ -109,13 +131,19 @@ namespace sushi_restaurant_tests
 
             order.Remove();
 
-            Assert.That(res.Orders, Is.Empty);
-
-            Assert.That(Order.Extent, Is.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(res.Orders, Is.Empty);
+                Assert.That(Order.Extent, Is.Empty);
+            });
         }
-        
+
+        // ------------------------------------------------------------
+        // ADDING ITEMS (DishInOrder)
+        // ------------------------------------------------------------
+
         [Test]
-        public void AddItemToOrder_Adds_Dish_And_Updates_OrderSum()
+        public void AddItemToOrder_Adds_DishInOrder_And_Updates_OrderSum()
         {
             var res = CreateReservation("A");
             var order = new Order(res);
@@ -123,13 +151,17 @@ namespace sushi_restaurant_tests
             var d1 = CreateDish("Miso Soup", 10m, DishType.Starter);
             var d2 = CreateDish("Green Tea", 5m, DishType.Drink);
 
-            order.AddItemToOrder(d1);
-            order.AddItemToOrder(d2);
+            order.AddItemToOrder(d1, quantity: 1);
+            order.AddItemToOrder(d2, quantity: 1);
 
-            Assert.That(order.Dishes, Has.Count.EqualTo(2));
-            Assert.That(order.Dishes, Does.Contain(d1));
-            Assert.That(order.Dishes, Does.Contain(d2));
-            Assert.That(order.OrderSum, Is.EqualTo(15m));
+            Assert.Multiple(() =>
+            {
+                Assert.That(order.Items.Count, Is.EqualTo(2));
+                Assert.That(order.Items.Select(i => i.Dish), Does.Contain(d1));
+                Assert.That(order.Items.Select(i => i.Dish), Does.Contain(d2));
+
+                Assert.That(order.OrderSum, Is.EqualTo(15m));
+            });
         }
 
         [Test]
@@ -138,11 +170,16 @@ namespace sushi_restaurant_tests
             var res = CreateReservation("A");
             var order = new Order(res);
 
-            Assert.Throws<ArgumentNullException>(() => order.AddItemToOrder(null!));
+            Assert.Throws<ArgumentNullException>(() =>
+                order.AddItemToOrder(null!, quantity: 1));
         }
 
+        // ------------------------------------------------------------
+        // REMOVING ITEMS (DishInOrder)
+        // ------------------------------------------------------------
+
         [Test]
-        public void RemoveItemFromOrder_Removes_Dish_And_Updates_OrderSum()
+        public void RemoveItemFromOrder_Removes_DishInOrder_And_Updates_OrderSum()
         {
             var res = CreateReservation("A");
             var order = new Order(res);
@@ -150,42 +187,28 @@ namespace sushi_restaurant_tests
             var d1 = CreateDish("Miso Soup", 10m, DishType.Starter);
             var d2 = CreateDish("Green Tea", 5m, DishType.Drink);
 
-            order.AddItemToOrder(d1);
-            order.AddItemToOrder(d2);
+            var i1 = order.AddItemToOrder(d1, 1);
+            var i2 = order.AddItemToOrder(d2, 1);
 
-            var removed = order.RemoveItemFromOrder(d1);
+            order.RemoveItemFromOrder(i1);
 
-            Assert.That(removed, Is.True);
-            Assert.That(order.Dishes, Has.Count.EqualTo(1));
-            Assert.That(order.Dishes.First(), Is.SameAs(d2));
-            Assert.That(order.OrderSum, Is.EqualTo(5m));
+            Assert.Multiple(() =>
+            {
+                Assert.That(order.Items.Count, Is.EqualTo(1));
+                Assert.That(order.Items.First(), Is.SameAs(i2));
+
+                Assert.That(order.OrderSum, Is.EqualTo(5m));
+            });
         }
 
         [Test]
-        public void RemoveItemFromOrder_Dish_Not_Present_Returns_False()
+        public void RemoveItemFromOrder_Null_Should_Throw()
         {
             var res = CreateReservation("A");
             var order = new Order(res);
 
-            var d1 = CreateDish("Miso Soup", 10m, DishType.Starter);
-            var d2 = CreateDish("Cola", 8m, DishType.Drink);
-
-            order.AddItemToOrder(d1);
-
-            var result = order.RemoveItemFromOrder(d2);
-
-            Assert.That(result, Is.False);
-            Assert.That(order.Dishes, Has.Count.EqualTo(1));
-            Assert.That(order.OrderSum, Is.EqualTo(10m));
-        }
-
-        [Test]
-        public void RemoveItemFromOrder_Null_Dish_Should_Throw()
-        {
-            var res = CreateReservation("A");
-            var order = new Order(res);
-
-            Assert.Throws<ArgumentNullException>(() => order.RemoveItemFromOrder(null!));
+            Assert.Throws<ArgumentNullException>(() =>
+                order.RemoveItemFromOrder(null!));
         }
     }
 }
