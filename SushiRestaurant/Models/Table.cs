@@ -1,4 +1,6 @@
-﻿namespace SushiRestaurant;
+﻿using System.Text.Json.Serialization;
+
+namespace SushiRestaurant;
 
 public class Table
 {
@@ -11,6 +13,7 @@ public class Table
     public int Capacity { get; }
 
     private readonly List<Reservation> _reservations = new();
+    [JsonIgnore]
     public IReadOnlyList<Reservation> Reservations => _reservations.AsReadOnly();
 
     public Table(int tableNumber, int capacity)
