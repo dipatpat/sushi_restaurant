@@ -1,5 +1,4 @@
-namespace SushiRestaurant;
-
+using SushiRestaurant;
 using System;
 using System.Linq;
 
@@ -16,6 +15,7 @@ public class Program
 
         if (!loaded)
         {
+            // --- SAMPLE DATA (guests, staff, etc.) ---
             var g1 = new Guest("Charlie", "Brown", "Chuck");
             var g2 = new Guest("Lucy", "Van Pelt");
             var t1 = new Table(1, 4);
@@ -33,8 +33,38 @@ public class Program
             };
 
             var order = new Order(res);
-            //order.AddItemToOrder(new Dish("Sushi Set", 120.50m, DishType.Sushi));
 
+            // ===== HISTORY ASSOCIATION DEMO (DishInOrder) =====
+            Console.WriteLine("\n=== DishInOrder (bag/history association) DEMO ===");
+
+            var dish1 = new Dish("Sushi Set", 120.50m, DishType.Sushi);
+            var dish2 = new Dish("Green Tea", 15m, DishType.Drink);
+
+            var item1 = order.AddItemToOrder(dish1, quantity: 1); // active
+            var item2 = order.AddItemToOrder(dish2, quantity: 1); // active
+
+            Console.WriteLine($"Initial OrderSum (both items active): {order.OrderSum}"); // 120.50 + 15 = 135.50
+            Console.WriteLine($"Reservation TotalCost: {res.TotalCost}");
+
+            Console.WriteLine($"Active items in order: {order.ActiveDishInOrderItems.Count}");
+            Console.WriteLine($"All items in order (history): {order.AllDishInOrderItems.Count}");
+            Console.WriteLine($"DishInOrder.Extent count: {DishInOrder.Extent.Count}");
+
+            // Now simulate removing one item from the order using history (Deactivate)
+            Console.WriteLine("\nDeactivating first DishInOrder (history-style remove)...");
+            item1.Deactivate();
+
+            Console.WriteLine($"OrderSum after deactivation: {order.OrderSum}");
+            Console.WriteLine($"Reservation TotalCost after deactivation: {res.TotalCost}");
+
+            Console.WriteLine($"Active items in order: {order.ActiveDishInOrderItems.Count}");
+            Console.WriteLine($"All items in order (history): {order.AllDishInOrderItems.Count}");
+            Console.WriteLine($"DishInOrder.Extent count (history kept): {DishInOrder.Extent.Count}");
+
+            Console.WriteLine($"item1.IsActive = {item1.IsActive}, TimeRemoved = {item1.TimeRemoved}");
+            Console.WriteLine($"item2.IsActive = {item2.IsActive}, TimeRemoved = {item2.TimeRemoved}");
+
+            // --- other sample domain objects (unchanged) ---
             var addr = new Address("Main St", "101", "00-001", "Metropolis");
 
             var ftMgr = new FullTimeManager("Alice", "Smith", addr, "PL00112233", "555-111-222",
@@ -52,14 +82,14 @@ public class Program
                                                 22000m, cleaningShift: "Evening", assignedArea: "Dining Hall",
                                                 hoursInContract: 15);
 
-            PrintCounts("After creating sample data");
+            PrintCounts("After creating sample data (with DishInOrder history demo)");
 
             Persistence.SaveAll();
             Console.WriteLine("Saved to sushi.json.");
         }
 
         ClearAllExtents();
-        PrintCounts("After manual clear)");
+        PrintCounts("After manual clear");
 
         var reloaded = Persistence.LoadAll();
         Console.WriteLine(reloaded ? "Reloaded from sushi.json." : "Reload failed.");
@@ -84,6 +114,9 @@ public class Program
         Console.WriteLine($"\n-- {label} --");
         Console.WriteLine($"Guests: {Guest.Extent.Count}");
         Console.WriteLine($"Reservations: {Reservation.Extent.Count}");
+        Console.WriteLine($"Orders: {Order.Extent.Count}");
+        Console.WriteLine($"Dishes: {Dish.Extent.Count}");
+        Console.WriteLine($"DishInOrder (history entries): {DishInOrder.Extent.Count}");
         Console.WriteLine($"FT Waiters: {FullTimeWaiter.Extent.Count} | PT Waiters: {PartTimeWaiter.Extent.Count}");
         Console.WriteLine($"FT Managers: {FullTimeManager.Extent.Count} | PT Managers: {PartTimeManager.Extent.Count}");
         Console.WriteLine($"FT Cooks: {FullTimeCook.Extent.Count} | PT Cooks: {PartTimeCook.Extent.Count}");
@@ -94,6 +127,9 @@ public class Program
     {
         Guest.ClearExtent();
         Reservation.ClearExtent();
+        Order.ClearExtent();
+        Dish.ClearExtent();
+        DishInOrder.ClearExtent();
 
         FullTimeWaiter.ClearExtent();
         PartTimeWaiter.ClearExtent();
