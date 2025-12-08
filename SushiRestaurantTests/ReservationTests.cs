@@ -270,6 +270,35 @@ namespace sushi_restaurant_tests
             Assert.That(reservation.TotalCost, Is.EqualTo(expectedTotal));
         }
         
+        [Test]
+        public void RemoveGuest_From_Reservation_Side_Updates_Both_Sides()
+        {
+            var guest = new Guest("Anna", "Nowak");
+            var table = new Table(1, 2);
+
+            var reservation = new Reservation(
+                DateTime.Now.AddHours(3),
+                numberOfGuests: 2,
+                guest: guest,
+                table: table);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(reservation.Guest, Is.SameAs(guest));
+                Assert.That(guest.Reservations, Has.Count.EqualTo(1));
+                Assert.That(guest.Reservations.Single(), Is.SameAs(reservation));
+            });
+
+            reservation.RemoveGuest();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(reservation.Guest, Is.Null);
+
+                Assert.That(guest.Reservations, Is.Empty);
+            });
+        }
+        
         
         }
     }
