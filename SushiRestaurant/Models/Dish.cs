@@ -56,7 +56,7 @@ public class Dish
     public DishType DishType { get; set; }
 
     private readonly HashSet<Ingredient> _ingredients = new HashSet<Ingredient>();
-    private readonly HashSet<DishInOrder> _dishInOrders = new();
+    private readonly HashSet<DishInOrder> _dishInOrdersItems = new();
     public Dish(string name, decimal price, DishType type)
     {
         DishName = name;
@@ -124,7 +124,7 @@ public class Dish
     
     
     [JsonIgnore]
-    public IReadOnlyCollection<DishInOrder> DishInOrders => _dishInOrders.ToList().AsReadOnly();
+    public IReadOnlyCollection<DishInOrder> DishInOrdersItems => _dishInOrdersItems.ToList().AsReadOnly();
 
     internal void InternalAddDishInOrder(DishInOrder item)
     {
@@ -132,7 +132,7 @@ public class Dish
         {
             throw new ArgumentNullException(nameof(item));
         }
-        _dishInOrders.Add(item);
+        _dishInOrdersItems.Add(item);
     }
 
     internal void InternalRemoveDishInOrder(DishInOrder item)
@@ -141,7 +141,7 @@ public class Dish
         {
             throw new ArgumentNullException(nameof(item));
         }
-        _dishInOrders.Remove(item);
+        _dishInOrdersItems.Remove(item);
     }
 
     public DishInOrder AddToOrder(Order order, int quantity)

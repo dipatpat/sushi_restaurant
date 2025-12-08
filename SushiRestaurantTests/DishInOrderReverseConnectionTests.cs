@@ -50,8 +50,8 @@ namespace sushi_restaurant_tests
                 Assert.That(order.DishInOrderItems, Has.Count.EqualTo(1));
                 Assert.That(order.DishInOrderItems.Single(), Is.SameAs(item));
 
-                Assert.That(dish.DishInOrders, Has.Count.EqualTo(1));
-                Assert.That(dish.DishInOrders.Single(), Is.SameAs(item));
+                Assert.That(dish.DishInOrdersItems, Has.Count.EqualTo(1));
+                Assert.That(dish.DishInOrdersItems.Single(), Is.SameAs(item));
             });
         }
 
@@ -70,7 +70,7 @@ namespace sushi_restaurant_tests
                 Assert.That(item.Quantity, Is.EqualTo(2));
 
                 Assert.That(order.DishInOrderItems.Single(), Is.SameAs(item));
-                Assert.That(dish.DishInOrders.Single(), Is.SameAs(item));
+                Assert.That(dish.DishInOrdersItems.Single(), Is.SameAs(item));
             });
         }
 
@@ -86,7 +86,7 @@ namespace sushi_restaurant_tests
             Assert.Multiple(() =>
             {
                 Assert.That(order.DishInOrderItems, Is.Empty);
-                Assert.That(dish.DishInOrders, Is.Empty);
+                Assert.That(dish.DishInOrdersItems, Is.Empty);
                 Assert.That(DishInOrder.Extent, Is.Empty);
             });
         }
@@ -103,7 +103,7 @@ namespace sushi_restaurant_tests
             Assert.Multiple(() =>
             {
                 Assert.That(order.DishInOrderItems, Is.Empty);
-                Assert.That(dish.DishInOrders, Is.Empty);
+                Assert.That(dish.DishInOrdersItems, Is.Empty);
                 Assert.That(DishInOrder.Extent, Is.Empty);
             });
         }
@@ -125,8 +125,8 @@ namespace sushi_restaurant_tests
                 Assert.That(order.DishInOrderItems, Has.Count.EqualTo(1));
                 Assert.That(order.DishInOrderItems.Single(), Is.SameAs(item));
 
-                Assert.That(dish.DishInOrders, Has.Count.EqualTo(1));
-                Assert.That(dish.DishInOrders.Single(), Is.SameAs(item));
+                Assert.That(dish.DishInOrdersItems, Has.Count.EqualTo(1));
+                Assert.That(dish.DishInOrdersItems.Single(), Is.SameAs(item));
 
                 Assert.That(DishInOrder.Extent.Count, Is.EqualTo(1));
                 Assert.That(DishInOrder.Extent.Single(), Is.SameAs(item));
