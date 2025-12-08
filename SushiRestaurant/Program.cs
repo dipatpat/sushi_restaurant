@@ -33,7 +33,7 @@ public class Program
             };
 
             var order = new Order(res);
-            order.AddItemToOrder(new Dish("Sushi Set", 120.50m, DishType.Sushi));
+            //order.AddItemToOrder(new Dish("Sushi Set", 120.50m, DishType.Sushi));
 
             var addr = new Address("Main St", "101", "00-001", "Metropolis");
 
