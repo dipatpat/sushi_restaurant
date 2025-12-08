@@ -1,4 +1,3 @@
-
 using SushiRestaurant;
 
 namespace sushi_restaurant_tests
@@ -13,6 +12,7 @@ namespace sushi_restaurant_tests
             Reservation.ClearExtent();
             Order.ClearExtent();
             Dish.ClearExtent();
+            DishInOrder.ClearExtent();
         }
 
         private static Guest CreateGuest(string name = "G")
@@ -25,8 +25,11 @@ namespace sushi_restaurant_tests
             var table = new Table(3, 2);
             var res = new Reservation(DateTime.Now.AddHours(3), 2, guest, table);
 
-            Assert.That(res.TotalCostHistory.Count, Is.EqualTo(1));
-            Assert.That(res.TotalCostHistory.First(), Is.EqualTo(0m));
+            Assert.Multiple(() =>
+            {
+                Assert.That(res.TotalCostHistory.Count, Is.EqualTo(1));
+                Assert.That(res.TotalCostHistory.First(), Is.EqualTo(0m));
+            });
         }
 
         [Test]
@@ -42,16 +45,19 @@ namespace sushi_restaurant_tests
 
             var initialCount = res.TotalCostHistory.Count;
 
-            order.AddItemToOrder(d1);
+            var i1 = order.AddItemToOrder(d1, quantity: 1); 
+            var i2 = order.AddItemToOrder(d2, quantity: 1); 
 
-            order.AddItemToOrder(d2); 
+            order.RemoveItemFromOrder(i1);                 
 
-            order.RemoveItemFromOrder(d1);
+            Assert.Multiple(() =>
+            {
+                Assert.That(res.TotalCostHistory.Count, Is.EqualTo(initialCount + 3));
 
-            Assert.That(res.TotalCostHistory.Count, Is.EqualTo(initialCount + 3));
+                Assert.That(res.TotalCostHistory.Last(), Is.EqualTo(res.TotalCost));
 
-            Assert.That(res.TotalCostHistory.Last(), Is.EqualTo(res.TotalCost));
-            Assert.That(res.TotalCost, Is.EqualTo(5m));
+                Assert.That(res.TotalCost, Is.EqualTo(5m));
+            });
         }
     }
 }
