@@ -53,10 +53,10 @@ public class Order
         _extent.Remove(this);
     }
 
-    private readonly HashSet<DishInOrder> _items = new();
+    private readonly HashSet<DishInOrder> _dishInOrderItems = new();
     
     [JsonIgnore]
-    public IReadOnlyCollection<DishInOrder> Items => _items.ToList().AsReadOnly();
+    public IReadOnlyCollection<DishInOrder> DishInOrderItems => _dishInOrderItems.ToList().AsReadOnly();
 
     internal void InternalAddDishInOrder(DishInOrder item)
     {
@@ -65,7 +65,7 @@ public class Order
             throw new ArgumentNullException(nameof(item));
         }
 
-        _items.Add(item);
+        _dishInOrderItems.Add(item);
         NotifyItemsChanged();
     }
 
@@ -75,7 +75,7 @@ public class Order
         {
             throw new ArgumentNullException(nameof(item));
         }
-        _items.Remove(item);
+        _dishInOrderItems.Remove(item);
         NotifyItemsChanged();
     }
 
@@ -111,7 +111,7 @@ public class Order
    
 
     [JsonIgnore]
-    public decimal OrderSum => _items.Sum(i => i.Dish.Price * i.Quantity);
+    public decimal OrderSum => _dishInOrderItems.Sum(i => i.Dish.Price * i.Quantity);
 
 
     public DateTime CreatedAt { get; private set; }
