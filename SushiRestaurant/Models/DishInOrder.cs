@@ -49,9 +49,16 @@ public class DishInOrder
 
     public void Remove()
     {
-        _order.InternalRemoveDishInOrder(this);
-        _dish.InternalRemoveDishInOrder(this);
-
+        if (_dish is null && _order is null)
+        {
+            return;
+        }
+        _order?.InternalRemoveDishInOrder(this);
+        _dish?.InternalRemoveDishInOrder(this);
+        
         _extent.Remove(this);
+        
+        _order = null;
+        _dish = null;
     }
 }

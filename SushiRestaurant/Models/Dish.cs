@@ -24,6 +24,7 @@ public class Dish
     }
 
     private string _dishName = default!;
+
     public string DishName
     {
         get => _dishName;
@@ -31,7 +32,7 @@ public class Dish
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("Dish name is required.");
-            
+
             var trimmed = value.Trim();
 
             if (trimmed.Length > 20)
@@ -42,6 +43,7 @@ public class Dish
     }
 
     private decimal _price;
+
     public decimal Price
     {
         get => _price;
@@ -57,6 +59,7 @@ public class Dish
 
     private readonly HashSet<Ingredient> _ingredients = new HashSet<Ingredient>();
     private readonly HashSet<DishInOrder> _dishInOrdersItems = new();
+
     public Dish(string name, decimal price, DishType type)
     {
         DishName = name;
@@ -66,12 +69,14 @@ public class Dish
         _extent.Add(this);
     }
 
-    public Dish() { }
+    public Dish()
+    {
+    }
 
     public IReadOnlySet<Ingredient> GetIngredients()
-        {
-            return new HashSet<Ingredient>(_ingredients);
-        }
+    {
+        return new HashSet<Ingredient>(_ingredients);
+    }
 
     public void AddIngredient(Ingredient ingredient)
     {
@@ -100,7 +105,8 @@ public class Dish
 
         if (!_ingredients.Any())
         {
-            Console.WriteLine($"Warning: Dish '{DishName}' now contains 0 ingredients, violating the 1..* minimum constraint.");
+            Console.WriteLine(
+                $"Warning: Dish '{DishName}' now contains 0 ingredients, violating the 1..* minimum constraint.");
         }
     }
 
@@ -121,10 +127,9 @@ public class Dish
             Console.WriteLine($"{dish.DishName} — {dish.Price:C} ({dish.DishType})");
         }
     }
-    
-    
-    [JsonIgnore]
-    public IReadOnlyCollection<DishInOrder> DishInOrdersItems => _dishInOrdersItems.ToList().AsReadOnly();
+
+
+    [JsonIgnore] public IReadOnlyCollection<DishInOrder> DishInOrdersItems => _dishInOrdersItems.ToList().AsReadOnly();
 
     internal void InternalAddDishInOrder(DishInOrder item)
     {
@@ -132,6 +137,7 @@ public class Dish
         {
             throw new ArgumentNullException(nameof(item));
         }
+
         _dishInOrdersItems.Add(item);
     }
 
@@ -141,6 +147,7 @@ public class Dish
         {
             throw new ArgumentNullException(nameof(item));
         }
+
         _dishInOrdersItems.Remove(item);
     }
 
@@ -150,6 +157,20 @@ public class Dish
         {
             throw new ArgumentNullException(nameof(order));
         }
+
         return new DishInOrder(this, order, quantity);
     }
+
+    public void RemoveFromOrder(DishInOrder item)
+    {
+        if (item is null)
+            throw new ArgumentNullException(nameof(item));
+        if (!ReferenceEquals(item.Dish, this))
+        {
+            throw new InvalidOperationException("This DishInOrder does not belong to this dish.");
+        }
+
+        item.Remove();
+    }
+
 }

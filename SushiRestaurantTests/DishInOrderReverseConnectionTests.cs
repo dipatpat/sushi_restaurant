@@ -75,6 +75,31 @@ namespace sushi_restaurant_tests
         }
 
         [Test]
+        public void Creating_DishInOrder_Directly_Should_Update_Order_And_Dish_Collections()
+        {
+            var order = CreateSampleOrder();
+            var dish = CreateSampleDish();
+
+            var item = new DishInOrder(dish, order, quantity: 2);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(item.Order, Is.SameAs(order));
+                Assert.That(item.Dish, Is.SameAs(dish));
+                Assert.That(item.Quantity, Is.EqualTo(2));
+
+                Assert.That(order.DishInOrderItems, Has.Count.EqualTo(1));
+                Assert.That(order.DishInOrderItems.Single(), Is.SameAs(item));
+
+                Assert.That(dish.DishInOrdersItems, Has.Count.EqualTo(1));
+                Assert.That(dish.DishInOrdersItems.Single(), Is.SameAs(item));
+
+                Assert.That(DishInOrder.Extent.Count, Is.EqualTo(1));
+                Assert.That(DishInOrder.Extent.Single(), Is.SameAs(item));
+            });
+        }
+
+        [Test]
         public void Remove_From_Association_Object_Should_Clear_Both_Sides()
         {
             var order = CreateSampleOrder();
@@ -107,31 +132,24 @@ namespace sushi_restaurant_tests
                 Assert.That(DishInOrder.Extent, Is.Empty);
             });
         }
-
+        
         [Test]
-        public void Creating_DishInOrder_Directly_Should_Update_Order_And_Dish_Collections()
+        public void Remove_From_Dish_Side_Should_Clear_Both_Sides()
         {
             var order = CreateSampleOrder();
             var dish = CreateSampleDish();
+            var item = order.AddItemToOrder(dish, 1);
 
-            var item = new DishInOrder(dish, order, quantity: 2);
+            dish.RemoveFromOrder(item);
 
             Assert.Multiple(() =>
             {
-                Assert.That(item.Order, Is.SameAs(order));
-                Assert.That(item.Dish, Is.SameAs(dish));
-                Assert.That(item.Quantity, Is.EqualTo(2));
-
-                Assert.That(order.DishInOrderItems, Has.Count.EqualTo(1));
-                Assert.That(order.DishInOrderItems.Single(), Is.SameAs(item));
-
-                Assert.That(dish.DishInOrdersItems, Has.Count.EqualTo(1));
-                Assert.That(dish.DishInOrdersItems.Single(), Is.SameAs(item));
-
-                Assert.That(DishInOrder.Extent.Count, Is.EqualTo(1));
-                Assert.That(DishInOrder.Extent.Single(), Is.SameAs(item));
+                Assert.That(order.DishInOrderItems, Is.Empty);
+                Assert.That(dish.DishInOrdersItems, Is.Empty);
+                Assert.That(DishInOrder.Extent, Is.Empty);
             });
         }
     }
+
 }
 
