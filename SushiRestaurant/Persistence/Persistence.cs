@@ -6,7 +6,8 @@ public static class Persistence
 {
     private static readonly JsonSerializerOptions Options = new()
     {
-        WriteIndented = true
+        WriteIndented = true,
+        PropertyNameCaseInsensitive = true
     };
 
     public static void SaveAll(string path = "sushi.json")
@@ -16,6 +17,9 @@ public static class Persistence
             Guests       = Guest.Extent.ToList(),
             Reservations = Reservation.Extent.ToList(),
 
+            Orders       = Order.Extent.ToList(),          
+            DishInOrders = DishInOrder.Extent.ToList(),    
+
             FullTimeWaiters  = FullTimeWaiter.Extent.ToList(),
             PartTimeWaiters  = PartTimeWaiter.Extent.ToList(),
             FullTimeManagers = FullTimeManager.Extent.ToList(),
@@ -23,7 +27,11 @@ public static class Persistence
             FullTimeCooks    = FullTimeCook.Extent.ToList(),
             PartTimeCooks    = PartTimeCook.Extent.ToList(),
             FullTimeCleaners = FullTimeCleaner.Extent.ToList(),
-            PartTimeCleaners = PartTimeCleaner.Extent.ToList()
+            PartTimeCleaners = PartTimeCleaner.Extent.ToList(),
+
+            Dishes      = Dish.Extent.ToList(),           
+            Ingredients = Ingredient.Extent.ToList(),      
+            Inventory   = Inventory.Extent.ToList()        
         };
 
         var json = JsonSerializer.Serialize(dto, Options);
@@ -41,10 +49,21 @@ public static class Persistence
             }
 
             var json = File.ReadAllText(path);
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                ClearAllExtents();
+                return false;
+            }
+
             var dto = JsonSerializer.Deserialize<SushiDto>(json, Options) ?? new SushiDto();
+
+            ClearAllExtents();
 
             Guest.SetExtent(dto.Guests);
             Reservation.SetExtent(dto.Reservations);
+
+            Order.SetExtent(dto.Orders);                 
+            DishInOrder.SetExtent(dto.DishInOrders);    
 
             FullTimeWaiter.SetExtent(dto.FullTimeWaiters);
             PartTimeWaiter.SetExtent(dto.PartTimeWaiters);
@@ -57,6 +76,10 @@ public static class Persistence
 
             FullTimeCleaner.SetExtent(dto.FullTimeCleaners);
             PartTimeCleaner.SetExtent(dto.PartTimeCleaners);
+
+            Dish.SetExtent(dto.Dishes);                  
+            Ingredient.SetExtent(dto.Ingredients);       
+            Inventory.SetExtent(dto.Inventory);          
 
             return true;
         }
@@ -72,6 +95,9 @@ public static class Persistence
         Guest.ClearExtent();
         Reservation.ClearExtent();
 
+        Order.ClearExtent();            
+        DishInOrder.ClearExtent();      
+
         FullTimeWaiter.ClearExtent();
         PartTimeWaiter.ClearExtent();
 
@@ -83,5 +109,9 @@ public static class Persistence
 
         FullTimeCleaner.ClearExtent();
         PartTimeCleaner.ClearExtent();
+
+        Dish.ClearExtent();             
+        Ingredient.ClearExtent();       
+        Inventory.ClearExtent();        
     }
 }

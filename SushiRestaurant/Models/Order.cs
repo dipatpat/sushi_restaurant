@@ -18,6 +18,12 @@ public class Order
     private static readonly List<Order> _extent = new();
     public static IReadOnlyList<Order> Extent => _extent.AsReadOnly();
     public static void ClearExtent() => _extent.Clear();
+    internal static void SetExtent(List<Order>? items)
+    {
+        _extent.Clear();
+        if (items is { Count: > 0 })
+            _extent.AddRange(items);
+    }
 
 
     private Reservation _reservation = default!;

@@ -5,6 +5,12 @@ public class DishInOrder
     private static readonly List<DishInOrder> _extent = new();
     public static IReadOnlyList<DishInOrder> Extent => _extent.AsReadOnly();
     public static void ClearExtent() => _extent.Clear();
+    internal static void SetExtent(List<DishInOrder>? items)
+    {
+        _extent.Clear();
+        if (items is { Count: > 0 })
+            _extent.AddRange(items);
+    }
 
     private Dish? _dish;
     public Dish Dish => _dish ?? throw new InvalidOperationException("Association no longer valid (Dish removed)");
@@ -15,8 +21,8 @@ public class DishInOrder
     public int Quantity { get; private set; }
     public DateTime TimeOrdered { get; }
     
-    public bool IsActive { get; private set; }
-    public DateTime? TimeRemoved { get; private set; }
+    public bool IsActive { get; set; }
+    public DateTime? TimeRemoved { get; set; }
 
     public DishInOrder(Dish dish, Order order, int quantity)
     {
