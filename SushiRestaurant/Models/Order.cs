@@ -92,7 +92,18 @@ public class Order
         _reservation.RegisterCostSnapshot();
     }
 
-    public void RemoveItemFromOrder(DishInOrder item)
+    public void RemoveCompletelyItemFromOrder(DishInOrder item)
+    {
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+        if (!ReferenceEquals(item.Order, this))
+            throw new InvalidOperationException("This DishInOrder doesn't belong to this order.");
+        item.RemoveCompletely();
+    }
+    
+    public void DeactivateItemFromOrder(DishInOrder item)
     {
         if (item is null)
         {

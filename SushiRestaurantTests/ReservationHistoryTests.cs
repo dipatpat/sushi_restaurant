@@ -48,7 +48,7 @@ namespace sushi_restaurant_tests
             var i1 = order.AddItemToOrder(d1, quantity: 1); 
             var i2 = order.AddItemToOrder(d2, quantity: 1); 
 
-            order.RemoveItemFromOrder(i1);                 
+            order.RemoveCompletelyItemFromOrder(i1);                 
 
             Assert.Multiple(() =>
             {

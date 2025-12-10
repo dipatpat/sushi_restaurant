@@ -184,7 +184,19 @@ public class Dish
         return new DishInOrder(this, order, quantity);
     }
 
-    public void RemoveFromOrder(DishInOrder item)
+    public void RemoveCompletelyFromOrder(DishInOrder item)
+    {
+        if (item is null)
+            throw new ArgumentNullException(nameof(item));
+        if (!ReferenceEquals(item.Dish, this))
+        {
+            throw new InvalidOperationException("This DishInOrder does not belong to this dish.");
+        }
+
+        item.RemoveCompletely();
+    }
+    
+    public void DeactivateFromOrder(DishInOrder item)
     {
         if (item is null)
             throw new ArgumentNullException(nameof(item));

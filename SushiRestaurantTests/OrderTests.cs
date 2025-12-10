@@ -190,7 +190,7 @@ namespace sushi_restaurant_tests
             var i1 = order.AddItemToOrder(d1, 1);
             var i2 = order.AddItemToOrder(d2, 1);
 
-            order.RemoveItemFromOrder(i1);
+            order.RemoveCompletelyItemFromOrder(i1);
 
             Assert.Multiple(() =>
             {
@@ -208,7 +208,7 @@ namespace sushi_restaurant_tests
             var order = new Order(res);
 
             Assert.Throws<ArgumentNullException>(() =>
-                order.RemoveItemFromOrder(null!));
+                order.RemoveCompletelyItemFromOrder(null!));
         }
     }
 }

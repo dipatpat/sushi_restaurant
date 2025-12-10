@@ -123,7 +123,7 @@ namespace sushi_restaurant_tests
             var dish = CreateSampleDish();
             var item = order.AddItemToOrder(dish, 1);
 
-            order.RemoveItemFromOrder(item);
+            order.RemoveCompletelyItemFromOrder(item);
 
             Assert.Multiple(() =>
             {
@@ -140,7 +140,7 @@ namespace sushi_restaurant_tests
             var dish = CreateSampleDish();
             var item = order.AddItemToOrder(dish, 1);
 
-            dish.RemoveFromOrder(item);
+            dish.RemoveCompletelyFromOrder(item);
 
             Assert.Multiple(() =>
             {
