@@ -22,11 +22,18 @@ namespace SushiRestaurantTests
         {
             var card = _guest.CreateLoyaltyCard("alice@example.com", LoyaltyType.gold, 50);
 
+            Assert.That(card.Owner, Is.EqualTo(_guest));
+
             _guest.RemoveLoyaltyCard();
 
             Assert.That(_guest.LoyaltyCard, Is.Null);
 
-            Assert.That(card.Owner, Is.EqualTo(_guest));
+            var ex = Assert.Throws<InvalidOperationException>(() =>
+            {
+                var temp = card.Owner;
+            });
+            Assert.That(ex.Message, Does.Contain("Association no longer valid"));
+            Assert.That(LoyaltyCard.Extent, Does.Not.Contain(card));
         }
 
         [Test]
