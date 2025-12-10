@@ -43,56 +43,112 @@ public class Ingredient
     }
 
     private readonly HashSet<Dish> _partOfDishes = new HashSet<Dish>();
-    private Dictionary<DateTime, Inventory> _inventoryBatches = new Dictionary<DateTime, Inventory>();
-
-    public Ingredient(string name, int quantity)
-    {
-        Name = name;
-        Quantity = quantity;
-
-        _extent.Add(this);
-    }
-
-    public Ingredient() {}
 
     public IReadOnlySet<Dish> GetPartByDishes()
     {
         return new HashSet<Dish>(_partOfDishes);
     }
 
+    public void AddDish(Dish dish)
+    {
+        if (dish == null) throw new ArgumentNullException(nameof(dish));
+
+        bool added = _partOfDishes.Add(dish);
+        if (!added) return;
+
+        if (!dish.GetIngredients().Contains(this))
+        {
+            dish.InternalAddIngredient(this);
+        }
+    }
+
+    internal void InternalAddDish(Dish dish)
+    {
+        if (dish == null) throw new ArgumentNullException(nameof(dish));
+        _partOfDishes.Add(dish);
+    }
+
+    public void RemoveDish(Dish dish)
+    {
+        if (dish == null) throw new ArgumentNullException(nameof(dish));
+
+        bool removed = _partOfDishes.Remove(dish);
+        if (!removed) return;
+
+        dish.InternalRemoveIngredient(this);
+    }
+
+    internal void InternalRemoveDish(Dish dish)
+    {
+        if (dish == null) throw new ArgumentNullException(nameof(dish));
+        _partOfDishes.Remove(dish);
+    }
+
+    private Dictionary<DateTime, Inventory> _inventoryBatches = new Dictionary<DateTime, Inventory>();
+
     public IReadOnlyDictionary<DateTime, Inventory> GetInventoryBatches()
     {
         return new Dictionary<DateTime, Inventory>(_inventoryBatches);
     }
 
-    internal void AddDish(Dish dish)
-    {
-        if (dish == null || _partOfDishes.Contains(dish))
-        {
-            return; 
-        }
-        _partOfDishes.Add(dish);
-    }
-
-    internal void RemoveDish(Dish dish)
-    {
-        if (dish == null || !_partOfDishes.Contains(dish))
-        {
-            return;
-        }
-        _partOfDishes.Remove(dish);
-    }
-
     public void AddInventoryBatch(Inventory inventoryItem)
     {
-        if (inventoryItem == null || _inventoryBatches.ContainsKey(inventoryItem.PurchaseDate))
+        if (inventoryItem == null) throw new ArgumentNullException(nameof(inventoryItem));
+        
+        if (_inventoryBatches.ContainsKey(inventoryItem.PurchaseDate))
         {
-            Console.WriteLine($"Error: Cannot add Inventory batch. Either it is null or a batch with purchase date {inventoryItem?.PurchaseDate:yyyy-MM-dd} already exists for {Name}.");
+            Console.WriteLine($"Error: A batch with purchase date {inventoryItem.PurchaseDate:yyyy-MM-dd} already exists for {Name}.");
             return;
         }
 
+        if (inventoryItem.Ingredient != null && !ReferenceEquals(inventoryItem.Ingredient, this))
+        {
+            inventoryItem.ChangeIngredient(this);
+            return;
+        }
         _inventoryBatches.Add(inventoryItem.PurchaseDate, inventoryItem);
         Console.WriteLine($"Ingredient '{Name}' linked to Inventory batch purchased on {inventoryItem.PurchaseDate:yyyy-MM-dd}.");
+
+        if (!ReferenceEquals(inventoryItem.Ingredient, this))
+        {
+            inventoryItem.InternalSetIngredientFromIngredient(this);
+        }
+    }
+
+    internal void InternalAddInventoryBatch(Inventory inventoryItem)
+    {
+        if (inventoryItem == null) throw new ArgumentNullException(nameof(inventoryItem));
+        
+        if (!_inventoryBatches.ContainsKey(inventoryItem.PurchaseDate))
+        {
+            _inventoryBatches.Add(inventoryItem.PurchaseDate, inventoryItem);
+        }
+    }
+
+    public void RemoveInventoryBatch(DateTime purchaseDate)
+    {
+        if (!_inventoryBatches.TryGetValue(purchaseDate, out var inventoryItem))
+        {
+            Console.WriteLine($"Warning: No Inventory batch found with purchase date {purchaseDate:yyyy-MM-dd} to remove.");
+            return;
+        }
+
+        _inventoryBatches.Remove(purchaseDate);
+        Console.WriteLine($"Removed link for '{Name}' to Inventory batch purchased on {purchaseDate:yyyy-MM-dd}.");
+
+        if (ReferenceEquals(inventoryItem.Ingredient, this))
+        {
+            inventoryItem.InternalRemoveIngredientFromIngredient(this);
+        }
+    }
+    
+    internal void InternalRemoveInventoryBatch(Inventory inventoryItem)
+    {
+        if (inventoryItem == null) return;
+        if (_inventoryBatches.ContainsKey(inventoryItem.PurchaseDate))
+        {
+            _inventoryBatches.Remove(inventoryItem.PurchaseDate);
+        }
     }
 
     public Inventory GetInventoryBatch(DateTime purchaseDate)
@@ -170,17 +226,14 @@ public class Ingredient
             HandleInsufficientQuantity(stillNeeded);
         }
     }
-    
-    public void RemoveInventoryBatch(DateTime purchaseDate)
+
+    public Ingredient(string name, int quantity)
     {
-        if (_inventoryBatches.ContainsKey(purchaseDate))
-        {
-            _inventoryBatches.Remove(purchaseDate);
-            Console.WriteLine($"Removed link for '{Name}' to Inventory batch purchased on {purchaseDate:yyyy-MM-dd}.");
-        }
-        else
-        {
-            Console.WriteLine($"Warning: No Inventory batch found with purchase date {purchaseDate:yyyy-MM-dd} to remove.");
-        }
+        Name = name;
+        Quantity = quantity;
+
+        _extent.Add(this);
     }
+
+    public Ingredient() {}
 }

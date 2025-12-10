@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
+
 namespace SushiRestaurant;
 
 public class Inventory
@@ -15,6 +17,66 @@ public class Inventory
         _extent.Clear();
         if (items is { Count: > 0 })
             _extent.AddRange(items);
+    }
+
+    private Ingredient? _ingredient;
+    
+    [JsonIgnore]
+    public Ingredient? Ingredient => _ingredient;
+
+    public void SetIngredient(Ingredient ingredient)
+    {
+        if (ingredient == null) throw new ArgumentNullException(nameof(ingredient));
+        if (ReferenceEquals(_ingredient, ingredient)) return;
+
+        if (_ingredient != null)
+        {
+            throw new InvalidOperationException("Ingredient is already set. Use ChangeIngredient to switch.");
+        }
+
+        _ingredient = ingredient;
+        ingredient.InternalAddInventoryBatch(this);
+    }
+
+    public void ChangeIngredient(Ingredient newIngredient)
+    {
+        if (newIngredient == null) throw new ArgumentNullException(nameof(newIngredient));
+        if (ReferenceEquals(_ingredient, newIngredient)) return;
+
+        var oldIngredient = _ingredient;
+        
+        if (oldIngredient != null)
+        {
+            oldIngredient.InternalRemoveInventoryBatch(this);
+        }
+
+        _ingredient = newIngredient;
+        newIngredient.InternalAddInventoryBatch(this);
+    }
+    
+    public void RemoveIngredient()
+    {
+        if (_ingredient == null) return;
+        
+        var oldIngredient = _ingredient;
+        _ingredient = null;
+        oldIngredient.InternalRemoveInventoryBatch(this);
+    }
+
+    internal void InternalSetIngredientFromIngredient(Ingredient ingredient)
+    {
+        if (ingredient == null) throw new ArgumentNullException(nameof(ingredient));
+        if (ReferenceEquals(_ingredient, ingredient)) return;
+        
+        _ingredient = ingredient;
+    }
+
+    internal void InternalRemoveIngredientFromIngredient(Ingredient ingredient)
+    {
+         if (ReferenceEquals(_ingredient, ingredient))
+         {
+             _ingredient = null;
+         }
     }
 
     private string _productName = default!;
@@ -97,7 +159,10 @@ public class Inventory
                 ? $"Expires: {item.ExpirationDate.Value:yyyy-MM-dd}"
                 : "No Expiration Date";
             
-            Console.WriteLine($"- {item.ProductName} (Purchased: {item.PurchaseDate:yyyy-MM-dd}), Quantity Left: {item.QuantityLeft}, {expiry}");
+            // Show Ingredient link if it exists
+            string linkedInfo = item.Ingredient != null ? $" [Linked to: {item.Ingredient.Name}]" : "";
+
+            Console.WriteLine($"- {item.ProductName}{linkedInfo} (Purchased: {item.PurchaseDate:yyyy-MM-dd}), Quantity Left: {item.QuantityLeft}, {expiry}");
         }
         Console.WriteLine("------------------------------");
     }

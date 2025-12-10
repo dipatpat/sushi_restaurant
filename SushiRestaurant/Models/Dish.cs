@@ -58,6 +58,61 @@ public class Dish
     public DishType DishType { get; set; }
 
     private readonly HashSet<Ingredient> _ingredients = new HashSet<Ingredient>();
+
+    public IReadOnlySet<Ingredient> GetIngredients()
+    {
+        return new HashSet<Ingredient>(_ingredients);
+    }
+
+    public void AddIngredient(Ingredient ingredient)
+    {
+        if (ingredient == null)
+            throw new ArgumentNullException(nameof(ingredient));
+
+        bool added = _ingredients.Add(ingredient);
+        if (!added) return;
+
+        if (!ingredient.GetPartByDishes().Contains(this))
+        {
+            ingredient.InternalAddDish(this);
+            Console.WriteLine($"Ingredient '{ingredient.Name}' added to Dish '{DishName}'.");
+        }
+    }
+
+    internal void InternalAddIngredient(Ingredient ingredient)
+    {
+        if (ingredient == null) throw new ArgumentNullException(nameof(ingredient));
+        _ingredients.Add(ingredient);
+    }
+
+    public void RemoveIngredient(Ingredient ingredient)
+    {
+        if (ingredient == null)
+            throw new ArgumentNullException(nameof(ingredient));
+
+        bool removed = _ingredients.Remove(ingredient);
+        if (!removed)
+        {
+            Console.WriteLine($"Warning: Ingredient is null or not found in Dish '{DishName}'.");
+            return;
+        }
+        ingredient.InternalRemoveDish(this);
+        
+        Console.WriteLine($"Ingredient '{ingredient.Name}' removed from Dish '{DishName}'.");
+
+        if (!_ingredients.Any())
+        {
+            Console.WriteLine(
+                $"Warning: Dish '{DishName}' now contains 0 ingredients, violating the 1..* minimum constraint.");
+        }
+    }
+
+    internal void InternalRemoveIngredient(Ingredient ingredient)
+    {
+        if (ingredient == null) throw new ArgumentNullException(nameof(ingredient));
+        _ingredients.Remove(ingredient);
+    }
+
     private readonly HashSet<DishInOrder> _dishInOrdersItems = new();
     
     [JsonIgnore]
@@ -65,6 +120,7 @@ public class Dish
         _dishInOrdersItems.Where(i => i.IsActive).ToList().AsReadOnly();
 
     [JsonIgnore] public IReadOnlyCollection<DishInOrder> AllDishInOrders => _dishInOrdersItems.ToList().AsReadOnly();
+    
     public Dish(string name, decimal price, DishType type)
     {
         DishName = name;
@@ -76,43 +132,6 @@ public class Dish
 
     public Dish()
     {
-    }
-
-    public IReadOnlySet<Ingredient> GetIngredients()
-    {
-        return new HashSet<Ingredient>(_ingredients);
-    }
-
-    public void AddIngredient(Ingredient ingredient)
-    {
-        if (ingredient == null || _ingredients.Contains(ingredient))
-        {
-            Console.WriteLine($"Warning: Ingredient is null or already present in Dish '{DishName}'.");
-            return;
-        }
-
-        _ingredients.Add(ingredient);
-        ingredient.AddDish(this);
-        Console.WriteLine($"Ingredient '{ingredient.Name}' added to Dish '{DishName}'.");
-    }
-
-    public void RemoveIngredient(Ingredient ingredient)
-    {
-        if (ingredient == null || !_ingredients.Contains(ingredient))
-        {
-            Console.WriteLine($"Warning: Ingredient is null or not found in Dish '{DishName}'.");
-            return;
-        }
-
-        _ingredients.Remove(ingredient);
-        ingredient.RemoveDish(this);
-        Console.WriteLine($"Ingredient '{ingredient.Name}' removed from Dish '{DishName}'.");
-
-        if (!_ingredients.Any())
-        {
-            Console.WriteLine(
-                $"Warning: Dish '{DishName}' now contains 0 ingredients, violating the 1..* minimum constraint.");
-        }
     }
 
     public void DisplayDetailedInformation()
@@ -132,7 +151,6 @@ public class Dish
             Console.WriteLine($"{dish.DishName} — {dish.Price:C} ({dish.DishType})");
         }
     }
-
 
     [JsonIgnore] public IReadOnlyCollection<DishInOrder> DishInOrdersItems => _dishInOrdersItems.ToList().AsReadOnly();
 
@@ -177,5 +195,4 @@ public class Dish
 
         item.Deactivate();
     }
-
 }
