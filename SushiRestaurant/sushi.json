@@ -1,0 +1,238 @@
+{
+  "Guests": [
+    {
+      "Nickname": "Chuck",
+      "LoyaltyCard": null,
+      "FirstName": "Charlie",
+      "LastName": "Brown"
+    },
+    {
+      "Nickname": null,
+      "LoyaltyCard": null,
+      "FirstName": "Lucy",
+      "LastName": "Van Pelt"
+    }
+  ],
+  "Reservations": [
+    {
+      "Guest": {
+        "Nickname": "Chuck",
+        "LoyaltyCard": null,
+        "FirstName": "Charlie",
+        "LastName": "Brown"
+      },
+      "Table": {
+        "TableNumber": 1,
+        "Capacity": 4
+      },
+      "StartDateTime": "2025-12-16T19:00:00+01:00",
+      "ReviewScore": 5,
+      "Comment": null,
+      "NumberOfGuests": 4,
+      "IsPaid": true,
+      "BonusPoints": 0
+    }
+  ],
+  "Orders": [
+    {
+      "Reservation": {
+        "Guest": {
+          "Nickname": "Chuck",
+          "LoyaltyCard": null,
+          "FirstName": "Charlie",
+          "LastName": "Brown"
+        },
+        "Table": {
+          "TableNumber": 1,
+          "Capacity": 4
+        },
+        "StartDateTime": "2025-12-16T19:00:00+01:00",
+        "ReviewScore": 5,
+        "Comment": null,
+        "NumberOfGuests": 4,
+        "IsPaid": true,
+        "BonusPoints": 0
+      },
+      "CreatedAt": "2025-12-09T08:55:01.169196+01:00",
+      "Status": 0
+    }
+  ],
+  "DishInOrders": [
+    {
+      "Dish": {
+        "DishName": "Sushi Set",
+        "Price": 120.50,
+        "DishType": 1
+      },
+      "Order": {
+        "Reservation": {
+          "Guest": {
+            "Nickname": "Chuck",
+            "LoyaltyCard": null,
+            "FirstName": "Charlie",
+            "LastName": "Brown"
+          },
+          "Table": {
+            "TableNumber": 1,
+            "Capacity": 4
+          },
+          "StartDateTime": "2025-12-16T19:00:00+01:00",
+          "ReviewScore": 5,
+          "Comment": null,
+          "NumberOfGuests": 4,
+          "IsPaid": true,
+          "BonusPoints": 0
+        },
+        "CreatedAt": "2025-12-09T08:55:01.169196+01:00",
+        "Status": 0
+      },
+      "Quantity": 1,
+      "TimeOrdered": "2025-12-09T08:55:01.169637+01:00",
+      "IsActive": false,
+      "TimeRemoved": "2025-12-09T08:55:01.171023+01:00"
+    },
+    {
+      "Dish": {
+        "DishName": "Green Tea",
+        "Price": 15,
+        "DishType": 2
+      },
+      "Order": {
+        "Reservation": {
+          "Guest": {
+            "Nickname": "Chuck",
+            "LoyaltyCard": null,
+            "FirstName": "Charlie",
+            "LastName": "Brown"
+          },
+          "Table": {
+            "TableNumber": 1,
+            "Capacity": 4
+          },
+          "StartDateTime": "2025-12-16T19:00:00+01:00",
+          "ReviewScore": 5,
+          "Comment": null,
+          "NumberOfGuests": 4,
+          "IsPaid": true,
+          "BonusPoints": 0
+        },
+        "CreatedAt": "2025-12-09T08:55:01.169196+01:00",
+        "Status": 0
+      },
+      "Quantity": 1,
+      "TimeOrdered": "2025-12-09T08:55:01.169942+01:00",
+      "IsActive": true,
+      "TimeRemoved": null
+    }
+  ],
+  "FullTimeWaiters": [],
+  "PartTimeWaiters": [
+    {
+      "HoursInContract": 20.5,
+      "SpokenLanguages": [
+        "English",
+        "Spanish"
+      ],
+      "Tips": 5000,
+      "Address": {
+        "StreetName": "Main St",
+        "StreetNumber": "101",
+        "PostalCode": "00-001",
+        "CityName": "Metropolis",
+        "ApartmentNumber": null,
+        "DoorNumber": null
+      },
+      "BankAccount": "PL99887766",
+      "PhoneNumber": "555-333-444",
+      "BaseSalary": 15000,
+      "IsFullTime": false,
+      "Contracts": [],
+      "FirstName": "Bob",
+      "LastName": "Johnson"
+    }
+  ],
+  "FullTimeManagers": [
+    {
+      "VacationDays": 25,
+      "IsOnSickLeave": false,
+      "SeniorityLevel": 1,
+      "Address": {
+        "StreetName": "Main St",
+        "StreetNumber": "101",
+        "PostalCode": "00-001",
+        "CityName": "Metropolis",
+        "ApartmentNumber": null,
+        "DoorNumber": null
+      },
+      "BankAccount": "PL00112233",
+      "PhoneNumber": "555-111-222",
+      "BaseSalary": 75000,
+      "IsFullTime": true,
+      "Contracts": [],
+      "FirstName": "Alice",
+      "LastName": "Smith"
+    }
+  ],
+  "PartTimeManagers": [],
+  "FullTimeCooks": [
+    {
+      "VacationDays": 12,
+      "IsOnSickLeave": false,
+      "Bonus": 3000,
+      "Specialization": "Sushi",
+      "Address": {
+        "StreetName": "Main St",
+        "StreetNumber": "101",
+        "PostalCode": "00-001",
+        "CityName": "Metropolis",
+        "ApartmentNumber": null,
+        "DoorNumber": null
+      },
+      "BankAccount": "PL11223344",
+      "PhoneNumber": "555-777-888",
+      "BaseSalary": 42000,
+      "IsFullTime": true,
+      "Contracts": [],
+      "FirstName": "Mina",
+      "LastName": "Tanaka"
+    }
+  ],
+  "PartTimeCooks": [],
+  "FullTimeCleaners": [],
+  "PartTimeCleaners": [
+    {
+      "HoursInContract": 15,
+      "CleaningShift": "Evening",
+      "AssignedArea": "Dining Hall",
+      "Address": {
+        "StreetName": "Main St",
+        "StreetNumber": "101",
+        "PostalCode": "00-001",
+        "CityName": "Metropolis",
+        "ApartmentNumber": null,
+        "DoorNumber": null
+      },
+      "BankAccount": "PL55667788",
+      "PhoneNumber": "555-000-111",
+      "BaseSalary": 22000,
+      "IsFullTime": false,
+      "Contracts": [],
+      "FirstName": "John",
+      "LastName": "Doe"
+    }
+  ],
+  "Dishes": [
+    {
+      "DishName": "Sushi Set",
+      "Price": 120.50,
+      "DishType": 1
+    },
+    {
+      "DishName": "Green Tea",
+      "Price": 15,
+      "DishType": 2
+    }
+  ],
+  "Ingredients": [],
+  "Inventory": []
+}

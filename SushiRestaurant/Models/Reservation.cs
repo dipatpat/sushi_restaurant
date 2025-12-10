@@ -21,7 +21,6 @@ public class Reservation
 
     private Guest _guest = default!;
     public Guest Guest => _guest;
-    // USED BY CONSTRUCTOR (Reservation side → calls Guest.InternalAddReservation)
     private void SetGuest(Guest guest)
     {
         if (guest is null)
@@ -31,7 +30,6 @@ public class Reservation
         guest.InternalAddReservation(this);   
     }
 
-    // USED BY GUEST.AddReservation (Guest side → NO reverse call)
     internal void InternalSetGuestFromGuest(Guest guest)
     {
         if (guest is null)
@@ -40,8 +38,7 @@ public class Reservation
         if (ReferenceEquals(guest, _guest))
             return;
         _guest = guest;
-        //no guest.InternalAddReservation(this) here,
-        // because Guest.AddReservation already updated its collection.
+        
     }
     
     public void ChangeGuest(Guest newGuest)

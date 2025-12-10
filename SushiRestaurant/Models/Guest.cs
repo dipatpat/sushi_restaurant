@@ -48,10 +48,8 @@ public class Guest : Person
             return;
         }
 
-        //add locally
         bool added = _reservations.Add(reservation);
         
-        //reverse connection
         if (!ReferenceEquals(reservation.Guest, this))
         {
             reservation.InternalSetGuestFromGuest(this);
