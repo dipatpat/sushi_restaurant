@@ -29,7 +29,7 @@ public class Guest : Person
         }
     }
     
-    public LoyaltyCard? LoyaltyCard { get; set; }
+    public LoyaltyCard? LoyaltyCard { get; private set; }
     private readonly HashSet<Reservation> _reservations = new();
     
     [JsonIgnore] 
@@ -97,8 +97,26 @@ public class Guest : Person
             reservation.InternalRemoveGuestFromGuest(this);
         }
     }
+
+    internal void InternalSetLoyaltyCard(LoyaltyCard card)
+    {
+        if (card is null) throw new ArgumentNullException(nameof(card));
+        
+        if (LoyaltyCard != null && !ReferenceEquals(LoyaltyCard, card))
+            throw new InvalidOperationException("Guest already has a loyalty card.");
+            
+        LoyaltyCard = card;
+    }
+
+    internal void InternalRemoveLoyaltyCard(LoyaltyCard card)
+    {
+        if (ReferenceEquals(LoyaltyCard, card))
+        {
+            LoyaltyCard = null;
+        }
+    }
     
-    public SushiRestaurant.Models.LoyaltyCard CreateLoyaltyCard(
+    public LoyaltyCard CreateLoyaltyCard(
         string email, 
         SushiRestaurant.Models.LoyaltyType type, 
         int points)
@@ -111,7 +129,10 @@ public class Guest : Person
 
     public void RemoveLoyaltyCard()
     {
-        LoyaltyCard = null;
+        if (LoyaltyCard != null)
+        {
+            LoyaltyCard.RemoveCompletely();
+        }
     }
 
     public Guest(string firstName, string lastName, string? nickname = null)
