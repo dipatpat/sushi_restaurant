@@ -7,13 +7,18 @@ namespace sushi_restaurant_tests
     [TestFixture]
     public class ContractTests
     {
-        private FullTimeWaiter CreateEmployee(string f = "John", string l = "Doe")
+        // Helper adjusted to use the Flattened Employee class
+        private Employee CreateEmployee(string f = "John", string l = "Doe")
         {
-            return new FullTimeWaiter(
-                f, l,
-                new Address("Street", "1", "00-001", "City"),
-                "BA123", "123456789",
-                3000m,
+            return new Employee(
+                firstName: f, 
+                lastName: l,
+                address: new Address("Street", "1", "00-001", "City"),
+                bankAccount: "BA123", 
+                phoneNumber: "123456789",
+                baseSalary: 3000m,
+                role: EmployeeRole.Waiter,
+                type: EmploymentType.FullTime,
                 vacationDays: 10,
                 isOnSickLeave: false,
                 tips: 100m
@@ -79,16 +84,17 @@ namespace sushi_restaurant_tests
             var emp1 = CreateEmployee("Anna", "Nowak");
             var emp2 = CreateEmployee("John", "Smith");
             
+            // Create initial contracts so employees have >1 contract if needed for logic
             var extra = new Contract(emp1, DateTime.Now.AddDays(1));
             var c = new Contract(emp1, DateTime.Now.AddDays(5));
 
             c.SetEmployee(emp2);
 
             Assert.That(c.Employee, Is.EqualTo(emp2));
+            // emp1 still has 'extra', so contract count logic is satisfied
             Assert.That(emp1.Contracts.Contains(c), Is.False);
             Assert.That(emp2.Contracts.Contains(c), Is.True);
         }
-
 
         [Test]
         public void SetEmployee_With_Same_Employee_Does_Nothing()
@@ -129,10 +135,12 @@ namespace sushi_restaurant_tests
             var c1 = new Contract(emp, DateTime.Now.AddDays(3));
             var c2 = new Contract(emp, DateTime.Now.AddDays(10));
 
+            // Logic: Removing c2 is fine because c1 remains
             emp.RemoveContract(c2);
 
             Assert.That(emp.Contracts.Count, Is.EqualTo(1));
 
+            // Logic: Removing the last contract (c1) should throw
             Assert.Throws<InvalidOperationException>(() =>
                 emp.RemoveContract(c1));
         }
@@ -146,14 +154,15 @@ namespace sushi_restaurant_tests
             var c1 = new Contract(emp1, DateTime.Now.AddDays(3));
             var c2 = new Contract(emp1, DateTime.Now.AddDays(5));
 
+            // Move c2 to emp2
             c2.SetEmployee(emp2);
 
             Assert.That(c2.Employee, Is.EqualTo(emp2));
             Assert.That(emp1.Contracts.Contains(c2), Is.False);
             Assert.That(emp2.Contracts.Contains(c2), Is.True);
             
+            // emp1 should still have c1
             Assert.That(emp1.Contracts.Count, Is.EqualTo(1));
         }
-
     }
 }

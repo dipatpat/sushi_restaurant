@@ -1,7 +1,6 @@
-﻿
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using SushiRestaurant;
-using SushiRestaurant.Models;
+// using SushiRestaurant.Models; // Namespace likely removed or merged
 
 namespace SushiRestaurantTests
 {
@@ -13,23 +12,53 @@ namespace SushiRestaurantTests
         [SetUp]
         public void Setup()
         {
-            _addr = new Address("Main St", "10", "12345", "City", "5");
+            // Reset extents before each test to prevent data pollution
+            Employee.ClearExtent();
+            _addr = new Address("Main St", "10", "123456", "City");
         }
 
-        private Waiter CreateWaiter(string name) =>
-            new(name, "Test", _addr, "BA", "555", 30, true);
+        // Helper: Creates an Employee with Role = Waiter
+        private Employee CreateWaiter(string name)
+        {
+            return new Employee(
+                firstName: name, 
+                lastName: "Test", 
+                address: _addr, 
+                bankAccount: "BA", 
+                phoneNumber: "555", 
+                baseSalary: 3000m, 
+                role: EmployeeRole.Waiter, 
+                type: EmploymentType.FullTime
+            );
+        }
 
-        private Cook CreateCook(string name) =>
-            new(name, "Test", _addr, "BA", "555", 30, true);
+        // Helper: Creates an Employee with Role = Cook
+        // (Even though Cook logic isn't fully implemented, the Enum exists for validation)
+        private Employee CreateCook(string name)
+        {
+            return new Employee(
+                firstName: name, 
+                lastName: "Test", 
+                address: _addr, 
+                bankAccount: "BA", 
+                phoneNumber: "555", 
+                baseSalary: 3000m, 
+                role: EmployeeRole.Cook, 
+                type: EmploymentType.FullTime
+            );
+        }
 
         [Test]
         public void Employee_Should_Assign_Mentor_Of_Same_Type()
         {
+            // Arrange
             var alice = CreateWaiter("Alice");
             var bob = CreateWaiter("Bob");
 
+            // Act
             bob.AssignMentor(alice);
 
+            // Assert
             Assert.That(bob.Mentor, Is.EqualTo(alice));
             Assert.That(alice.Mentees.Contains(bob), Is.True);
         }
@@ -37,13 +66,18 @@ namespace SushiRestaurantTests
         [Test]
         public void Employee_Cannot_Have_Mentor_Of_Different_Type()
         {
+            // Arrange
             var waiter = CreateWaiter("Alice");
             var cook = CreateCook("Charlie");
 
-            Assert.Throws<InvalidOperationException>(() =>
+            // Act & Assert
+            // This fails because waiter.Role (Waiter) != cook.Role (Cook)
+            var ex = Assert.Throws<InvalidOperationException>(() =>
             {
                 waiter.AssignMentor(cook);
             });
+            
+            Assert.That(ex.Message, Does.Contain("same role"));
         }
 
         [Test]

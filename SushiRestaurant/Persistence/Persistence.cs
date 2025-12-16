@@ -20,14 +20,8 @@ public static class Persistence
             Orders       = Order.Extent.ToList(),          
             DishInOrders = DishInOrder.Extent.ToList(),    
 
-            FullTimeWaiters  = FullTimeWaiter.Extent.ToList(),
-            PartTimeWaiters  = PartTimeWaiter.Extent.ToList(),
-            FullTimeManagers = FullTimeManager.Extent.ToList(),
-            PartTimeManagers = PartTimeManager.Extent.ToList(),
-            FullTimeCooks    = FullTimeCook.Extent.ToList(),
-            PartTimeCooks    = PartTimeCook.Extent.ToList(),
-            FullTimeCleaners = FullTimeCleaner.Extent.ToList(),
-            PartTimeCleaners = PartTimeCleaner.Extent.ToList(),
+            // FLATTENING CHANGE: We now save the single Employee extent
+            Employees    = Employee.Extent.ToList(),
 
             Dishes      = Dish.Extent.ToList(),           
             Ingredients = Ingredient.Extent.ToList(),      
@@ -65,17 +59,8 @@ public static class Persistence
             Order.SetExtent(dto.Orders);                 
             DishInOrder.SetExtent(dto.DishInOrders);    
 
-            FullTimeWaiter.SetExtent(dto.FullTimeWaiters);
-            PartTimeWaiter.SetExtent(dto.PartTimeWaiters);
-
-            FullTimeManager.SetExtent(dto.FullTimeManagers);
-            PartTimeManager.SetExtent(dto.PartTimeManagers);
-
-            FullTimeCook.SetExtent(dto.FullTimeCooks);
-            PartTimeCook.SetExtent(dto.PartTimeCooks);
-
-            FullTimeCleaner.SetExtent(dto.FullTimeCleaners);
-            PartTimeCleaner.SetExtent(dto.PartTimeCleaners);
+            // FLATTENING CHANGE: Load the single Employee list
+            Employee.SetExtent(dto.Employees);
 
             Dish.SetExtent(dto.Dishes);                  
             Ingredient.SetExtent(dto.Ingredients);       
@@ -98,17 +83,8 @@ public static class Persistence
         Order.ClearExtent();            
         DishInOrder.ClearExtent();      
 
-        FullTimeWaiter.ClearExtent();
-        PartTimeWaiter.ClearExtent();
-
-        FullTimeManager.ClearExtent();
-        PartTimeManager.ClearExtent();
-
-        FullTimeCook.ClearExtent();
-        PartTimeCook.ClearExtent();
-
-        FullTimeCleaner.ClearExtent();
-        PartTimeCleaner.ClearExtent();
+        // FLATTENING CHANGE: Clear the single Employee extent
+        Employee.ClearExtent();
 
         Dish.ClearExtent();             
         Ingredient.ClearExtent();       

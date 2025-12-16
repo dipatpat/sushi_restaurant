@@ -20,7 +20,7 @@ namespace sushi_restaurant_tests
         [Test]
         public void Should_Calculate_EndDateTime_As_Start_Plus_3_Hours()
         {
-            var start = new DateTime(2025, 12, 12, 18, 0, 0);
+            var start = new DateTime(2026, 1, 12, 18, 0, 0);
             var reservation = new Reservation { StartDateTime = start };
 
             var expectedEnd = start.AddHours(Reservation.DurationHours);

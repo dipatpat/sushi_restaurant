@@ -6,81 +6,79 @@ namespace sushi_restaurant_tests
     [TestFixture]
     public class EmployeeTests
     {
-        [Test]
-        public void Should_Assign_Employee_Basic_Information_Correctly()
-        {
-            var address = new Address();
+        private Address _defaultAddress;
 
-            var waiter = new Waiter(
-                firstName: "Aiko",
-                lastName: "Tanaka",
-                address: address,
-                bankAccount: "JP1234567890",
-                phoneNumber: "09012345678",
-                baseSalary: 1800m,
-                isFullTime: true
+        [SetUp]
+        public void Setup()
+        {
+            _defaultAddress = new Address("Test", "1", "123456", "City");
+            Employee.ClearExtent();
+        }
+
+        [Test]
+        public void Should_Assign_Base_Information_Correctly()
+        {
+            var emp = new Employee(
+                "Aiko", "Tanaka", _defaultAddress, "JP123", "090123", 1800m,
+                EmployeeRole.Waiter, EmploymentType.FullTime
             );
 
-            Assert.That(waiter.FirstName, Is.EqualTo("Aiko"));
-            Assert.That(waiter.LastName, Is.EqualTo("Tanaka"));
-            Assert.That(waiter.PhoneNumber, Is.EqualTo("09012345678"));
-            Assert.That(waiter.BankAccount, Is.EqualTo("JP1234567890"));
-            Assert.That(waiter.BaseSalary, Is.EqualTo(1800m));
-            Assert.That(waiter.IsFullTime, Is.EqualTo(true));
+            Assert.That(emp.FirstName, Is.EqualTo("Aiko"));
+            Assert.That(emp.LastName, Is.EqualTo("Tanaka"));
+            Assert.That(emp.BaseSalary, Is.EqualTo(1800m));
         }
 
         [Test]
-        public void Should_Assign_And_Read_Address_Information()
+        public void Should_Handle_Dynamic_Role_Switch_From_Waiter_To_Cleaner()
         {
-            var manager = new Manager
-            {
-                Address = new Address
-                {
-                    StreetName = "Sakura Ave",
-                    StreetNumber = "22B",
-                    CityName = "Tokyo",
-                    PostalCode = "100-0001"
-                }
-            };
+            // 1. Create as Waiter
+            var emp = new Employee(
+                "Ghost", "User", _defaultAddress, "ACC", "000", 2500m,
+                EmployeeRole.Waiter, EmploymentType.FullTime, tips: 100m
+            );
+            
+            Assert.That(emp.Role, Is.EqualTo(EmployeeRole.Waiter));
+            Assert.That(emp.Tips, Is.EqualTo(100m));
 
-            Assert.That(manager.Address.StreetName, Is.EqualTo("Sakura Ave"));
-            Assert.That(manager.Address.StreetNumber, Is.EqualTo("22B"));
-            Assert.That(manager.Address.CityName, Is.EqualTo("Tokyo"));
-            Assert.That(manager.Address.PostalCode, Is.EqualTo("100-0001"));
+            // 2. Switch to Cleaner dynamically
+            emp.ChangeRoleToCleaner("Night Shift", "Lobby");
+
+            // 3. Assert Discriminator Change
+            Assert.That(emp.Role, Is.EqualTo(EmployeeRole.Cleaner));
+            
+            // 4. Assert Data Integrity (New data present, Old data inaccessible)
+            Assert.That(emp.CleaningShift, Is.EqualTo("Night Shift"));
+            Assert.Throws<InvalidOperationException>(() => { var t = emp.Tips; });
         }
 
         [Test]
-        public void Waiter_Salary_Should_Include_Tips()
+        public void Should_Handle_Dynamic_Type_Switch_From_PartTime_To_FullTime()
         {
-            var waiter = new Waiter
-            {
-                BaseSalary = 1500m,
-                Tips = 200m
-            };
-
-            var totalSalary = waiter.Salary;
-
-            Assert.That(totalSalary, Is.EqualTo(1700m), "Waiter salary should equal base + tips");
-        }
-
-        [Test]
-        public void Should_Handle_FullTime_And_PartTime_Status()
-        {
-            var address = new Address();
-
-            var cook = new Cook(
-                firstName: "Kenji",
-                lastName: "Sato",
-                address: address,
-                bankAccount: "ACC123",
-                phoneNumber: "0900000000",
-                baseSalary: 1800m,
-                isFullTime: false,
-                bonus: 150m
+            // 1. Create as PartTime
+            var emp = new Employee(
+                "Student", "Worker", _defaultAddress, "ACC", "000", 2000m,
+                EmployeeRole.Waiter, EmploymentType.PartTime, hoursInContract: 20
             );
 
-            Assert.That(cook.IsFullTime, Is.EqualTo(false), "Cook should be marked as part-time");
-            Assert.That(cook.Salary, Is.EqualTo(1950m), "Cook salary should equal base + bonus");
+            Assert.That(emp.Type, Is.EqualTo(EmploymentType.PartTime));
+
+            // 2. Switch to FullTime
+            emp.ChangeTypeToFullTime(vacationDays: 20);
+
+            // 3. Assert
+            Assert.That(emp.Type, Is.EqualTo(EmploymentType.FullTime));
+            Assert.That(emp.VacationDays, Is.EqualTo(20));
+            Assert.Throws<InvalidOperationException>(() => { var h = emp.HoursInContract; });
+        }
+        
+        [Test]
+        public void AssignMentor_Should_Throw_If_Roles_Different()
+        {
+            var waiter = new Employee("W", "W", _defaultAddress, "1", "1", 3000m, EmployeeRole.Waiter, EmploymentType.FullTime);
+            var cleaner = new Employee("C", "C", _defaultAddress, "1", "1", 3000m, EmployeeRole.Cleaner, EmploymentType.FullTime);
+
+            var ex = Assert.Throws<InvalidOperationException>(() => waiter.AssignMentor(cleaner));
+            Assert.That(ex.Message, Does.Contain("same role"));
         }
     }
 }

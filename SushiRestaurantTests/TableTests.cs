@@ -50,7 +50,7 @@ namespace sushi_restaurant_tests
         {
             var t = CreateTable();
             var r1 = new Reservation(
-                DateTime.Today.AddHours(18),
+                new DateTime(2026, 1, 16, 20, 30, 0),
                 2,
                 CreateGuest(),
                 t);
@@ -58,7 +58,7 @@ namespace sushi_restaurant_tests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 var r2 = new Reservation(
-                    DateTime.Today.AddHours(18),
+                    new DateTime(2026, 1, 16, 20, 30, 0),
                     3,
                     CreateGuest(),
                     t);
@@ -72,14 +72,14 @@ namespace sushi_restaurant_tests
             var t = CreateTable();
 
             var r1 = new Reservation(
-                DateTime.Today.AddHours(18),
+                new DateTime(2026, 1, 16, 20, 30, 0),
                 2,
                 CreateGuest(),
                 t
             );
 
             var r2 = new Reservation(
-                DateTime.Today.AddHours(19),
+                new DateTime(2026, 1, 16, 14, 30, 0),
                 3,
                 CreateGuest(),
                 t

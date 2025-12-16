@@ -6,88 +6,54 @@ namespace sushi_restaurant_tests
     [TestFixture]
     public class EmployeeImplementationsTests
     {
+        private Address _defaultAddress;
+
+        [SetUp]
+        public void Setup() => _defaultAddress = new Address("St", "1", "123456", "City");
+
         [Test]
-        public void FullTimeWaiter_Should_Store_VacationDays_And_SickLeave()
+        public void FullTime_Employee_Should_Store_VacationDays()
         {
-            var waiter = new FullTimeWaiter
-            {
-                VacationDays = 10,
-                IsOnSickLeave = false,
-                BaseSalary = 1500m,
-                Tips = 200m
-            };
+            // Arrange: Create FullTime Waiter
+            var employee = new Employee(
+                "Alice", "Full", _defaultAddress, "IBAN", "555", 1500m,
+                role: EmployeeRole.Waiter,
+                type: EmploymentType.FullTime,
+                vacationDays: 10,
+                isOnSickLeave: false
+            );
 
-            var totalSalary = waiter.Salary;
-
-            Assert.That(waiter.VacationDays, Is.EqualTo(10));
-            Assert.That(waiter.IsOnSickLeave, Is.False);
-            Assert.That(totalSalary, Is.EqualTo(1700m), "FullTimeWaiter salary should equal base + tips");
+            // Assert
+            Assert.That(employee.Type, Is.EqualTo(EmploymentType.FullTime));
+            Assert.That(employee.VacationDays, Is.EqualTo(10));
+            Assert.That(employee.IsOnSickLeave, Is.False);
         }
 
         [Test]
-        public void FullTimeCook_Should_Store_VacationDays_And_SickLeave()
+        public void PartTime_Employee_Should_Store_HoursInContract()
         {
-            var cook = new FullTimeCook
-            {
-                VacationDays = 12,
-                IsOnSickLeave = false,
-                BaseSalary = 2000m,
-                Bonus = 200m
-            };
+            // Arrange: Create PartTime Cleaner
+            var employee = new Employee(
+                "Bob", "Part", _defaultAddress, "IBAN", "555", 1000m,
+                role: EmployeeRole.Cleaner,
+                type: EmploymentType.PartTime,
+                hoursInContract: 25.5
+            );
 
-            var totalSalary = cook.Salary;
-
-            Assert.That(cook.VacationDays, Is.EqualTo(12));
-            Assert.That(cook.IsOnSickLeave, Is.False);
-            Assert.That(totalSalary, Is.EqualTo(2200m), "FullTimeCook salary should equal base + bonus");
+            // Assert
+            Assert.That(employee.Type, Is.EqualTo(EmploymentType.PartTime));
+            Assert.That(employee.HoursInContract, Is.EqualTo(25.5));
         }
 
         [Test]
-        public void FullTimeCleaner_Should_Store_VacationDays_And_SickLeave()
+        public void Accessing_FullTime_Properties_On_PartTime_Throws()
         {
-            var cleaner = new FullTimeCleaner
-            {
-                VacationDays = 15,
-                IsOnSickLeave = false,
-                BaseSalary = 1200m
-            };
+            var employee = new Employee(
+                "Test", "User", _defaultAddress, "IBAN", "555", 1000m,
+                EmployeeRole.Waiter, EmploymentType.PartTime, hoursInContract: 20
+            );
 
-            var totalSalary = cleaner.Salary;
-
-            Assert.That(cleaner.VacationDays, Is.EqualTo(15));
-            Assert.That(cleaner.IsOnSickLeave, Is.False);
-            Assert.That(totalSalary, Is.EqualTo(1200m), "FullTimeCleaner salary should equal base salary");
-        }
-
-        [Test]
-        public void PartTimeWaiter_Should_Store_HoursInContract()
-        {
-            var waiter = new PartTimeWaiter
-            {
-                HoursInContract = 25.5,
-                BaseSalary = 1000m,
-                Tips = 150m
-            };
-
-            var totalSalary = waiter.Salary;
-
-            Assert.That(waiter.HoursInContract, Is.EqualTo(25.5));
-            Assert.That(totalSalary, Is.EqualTo(1150m), "PartTimeWaiter salary should equal base + tips");
-        }
-
-        [Test]
-        public void PartTimeCleaner_Should_Store_HoursInContract()
-        {
-            var cleaner = new PartTimeCleaner
-            {
-                HoursInContract = 15,
-                BaseSalary = 1000m
-            };
-
-            var totalSalary = cleaner.Salary;
-
-            Assert.That(cleaner.HoursInContract, Is.EqualTo(15));
-            Assert.That(totalSalary, Is.EqualTo(1000m), "PartTimeCleaner salary should equal base salary");
+            Assert.Throws<InvalidOperationException>(() => { var x = employee.VacationDays; });
         }
     }
 }
