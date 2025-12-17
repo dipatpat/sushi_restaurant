@@ -83,6 +83,16 @@ namespace sushi_restaurant_tests
             Assert.Throws<InvalidOperationException>(() => { var x = cleaner.Tips; });
             Assert.Throws<InvalidOperationException>(() => cleaner.AddLanguage("English"));
         }
+        
+        [Test]
+        public void EmployeeRole_Should_Contain_Manager_And_Cook()
+        {
+            Assert.That(Enum.IsDefined(typeof(EmployeeRole), EmployeeRole.Manager));
+            Assert.That(Enum.IsDefined(typeof(EmployeeRole), EmployeeRole.Cook));
+        }
+
+        
+        
 
         // [Test]
         // public void Manager_Should_Apply_SeniorityLevel_Multiplier()

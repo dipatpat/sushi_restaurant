@@ -176,6 +176,79 @@ public class Employee
             _assignedArea = value.Trim();
         }
     }
+    
+    //  manager fields
+    private SeniorityLevel? _seniorityLevel;
+    private int? _managerBonusDays;
+    
+    
+    public SeniorityLevel SeniorityLevel
+    {
+        get
+        {
+            EnsureRole(EmployeeRole.Manager);
+            return _seniorityLevel!.Value;
+        }
+        set
+        {
+            EnsureRole(EmployeeRole.Manager);
+            _seniorityLevel = value;
+        }
+    }
+
+    public int ManagerBonusDays
+    {
+        get
+        {
+            EnsureRole(EmployeeRole.Manager);
+            return _managerBonusDays!.Value;
+        }
+        set
+        {
+            EnsureRole(EmployeeRole.Manager);
+            if (value < 0)
+                throw new ArgumentOutOfRangeException(nameof(ManagerBonusDays));
+            _managerBonusDays = value;
+        }
+    }
+    
+   //  cook fields
+    private string? _specialization;
+    private decimal? _bonus;
+    
+    
+    public string Specialization
+    {
+        get
+        {
+            EnsureRole(EmployeeRole.Cook);
+            return _specialization!;
+        }
+        set
+        {
+            EnsureRole(EmployeeRole.Cook);
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Specialization is required.");
+            _specialization = value.Trim();
+        }
+    }
+
+    public decimal Bonus
+    {
+        get
+        {
+            EnsureRole(EmployeeRole.Cook);
+            return _bonus!.Value;
+        }
+        set
+        {
+            EnsureRole(EmployeeRole.Cook);
+            if (value < 0)
+                throw new ArgumentOutOfRangeException(nameof(Bonus));
+            _bonus = value;
+        }
+    }
+    
 
     // ASPECT FULL-TIME PART-TIME
 
@@ -254,7 +327,40 @@ public class Employee
         CleaningShift = shift;
         AssignedArea = area;
     }
+    
+    public void ChangeRoleToManager(SeniorityLevel level, int bonusDays)
+    {
+        // clear other roles
+        _spokenLanguages = null;
+        _tips = null;
+        _cleaningShift = null;
+        _assignedArea = null;
+        _specialization = null;
+        _bonus = null;
 
+        // initialize Manager fields
+        Role = EmployeeRole.Manager;
+        _seniorityLevel = level;
+        _managerBonusDays = bonusDays;
+    }
+
+    public void ChangeRoleToCook(string specialization, decimal bonus)
+    {
+        // clear other roles
+        _spokenLanguages = null;
+        _tips = null;
+        _cleaningShift = null;
+        _assignedArea = null;
+        _seniorityLevel = null;
+        _managerBonusDays = null;
+        
+        // initialize Cook fields
+        Role = EmployeeRole.Cook;
+        Specialization = specialization;
+        Bonus = bonus;
+    }
+
+    
     // dynamic change of employment type
     public void ChangeTypeToFullTime(int vacationDays, bool sickLeave = false)
     {
@@ -357,6 +463,12 @@ public class Employee
         {
             if (Role == EmployeeRole.Waiter) return BaseSalary + (_tips ?? 0m);
             // add logic for manager and cook here
+
+            if (Role == EmployeeRole.Manager) return BaseSalary + (_managerBonusDays ?? 0m);
+            if (Role == EmployeeRole.Cook) return BaseSalary + (_bonus ?? 0m);
+
+
+            
             return BaseSalary;
         }
     }
@@ -371,6 +483,7 @@ public class Employee
         string bankAccount, 
         string phoneNumber, 
         decimal baseSalary,
+        
         
         // 2. Discriminators (Mandatory to determine identity)
         EmployeeRole role,
@@ -423,9 +536,23 @@ public class Employee
                 ChangeRoleToCleaner(shift, area);
                 break;
             
-            // Cases for Manager/Cook would go here in the future
+            // Cases for Manager/Cook would go here 
             case EmployeeRole.Manager:
+                // Assigns managerial seniority level (Junior)
+                ChangeRoleToManager(
+                    level: SeniorityLevel.Junior,
+                    bonusDays: vacationDays
+                );
+                break;
+            
             case EmployeeRole.Cook:
+                // - Specialization describes the cooking area (Sushi, Grill)
+                var spec = cleaningShift ?? "General";
+                ChangeRoleToCook(
+                    specialization: spec,
+                    bonus: tips
+                );
+                break;
             default:
                 // If role is None or not yet implemented, we define basic state
                 Role = role; 
