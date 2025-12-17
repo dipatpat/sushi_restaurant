@@ -5,7 +5,6 @@ namespace SushiRestaurant;
 // enums instead of EmploymentType and EmploymnetRole classes, because Flattening
 public enum EmployeeRole
 {
-    None,
     Waiter,
     Cleaner,
     Manager,
@@ -14,7 +13,6 @@ public enum EmployeeRole
 
 public enum EmploymentType
 {
-    None,
     FullTime,
     PartTime
 }
