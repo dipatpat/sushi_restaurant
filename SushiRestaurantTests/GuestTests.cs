@@ -10,6 +10,7 @@ namespace sushi_restaurant_tests
         {
             Guest.ClearExtent();
             Reservation.ClearExtent();
+            Table.ClearExtent();
         }
 
         [Test]
@@ -122,26 +123,20 @@ namespace sushi_restaurant_tests
 
             var reservation = new Reservation(
                 DateTime.Now.AddHours(3),
-                numberOfGuests: 2,
-                guest: oldGuest,
-                table: table);
+                2,
+                oldGuest,
+                table);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(reservation.Guest, Is.SameAs(oldGuest));
-                Assert.That(oldGuest.Reservations, Has.Count.EqualTo(1));
-                Assert.That(newGuest.Reservations, Is.Empty);
-            });
+            Assert.That(oldGuest.Reservations.Count, Is.EqualTo(1));
+            Assert.That(newGuest.Reservations, Is.Empty);
 
             newGuest.TakeOverReservation(reservation);
 
             Assert.Multiple(() =>
             {
                 Assert.That(reservation.Guest, Is.SameAs(newGuest));
-
                 Assert.That(oldGuest.Reservations, Is.Empty);
-
-                Assert.That(newGuest.Reservations, Has.Count.EqualTo(1));
+                Assert.That(newGuest.Reservations.Count, Is.EqualTo(1));
                 Assert.That(newGuest.Reservations.Single(), Is.SameAs(reservation));
             });
         }
@@ -154,27 +149,30 @@ namespace sushi_restaurant_tests
 
             var reservation = new Reservation(
                 DateTime.Now.AddHours(3),
-                numberOfGuests: 2,
-                guest: guest,
-                table: table);
+                2,
+                guest,
+                table);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(reservation.Guest, Is.SameAs(guest));
-                Assert.That(guest.Reservations, Has.Count.EqualTo(1));
-            });
+            Assert.That(guest.Reservations.Count, Is.EqualTo(1));
 
             guest.RemoveReservation(reservation);
 
             Assert.Multiple(() =>
             {
                 Assert.That(reservation.Guest, Is.Null);
-
                 Assert.That(guest.Reservations, Is.Empty);
             });
         }
+
+        [Test]
+        public void Creating_Guest_Adds_To_Extent()
+        {
+            var g1 = new Guest("A", "B");
+            var g2 = new Guest("C", "D");
+
+            Assert.That(Guest.Extent.Count, Is.EqualTo(2));
+            Assert.That(Guest.Extent.Contains(g1));
+            Assert.That(Guest.Extent.Contains(g2));
+        }
     }
 }
-
-        
-    

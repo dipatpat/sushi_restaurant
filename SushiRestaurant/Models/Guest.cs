@@ -3,8 +3,35 @@ using SushiRestaurant.Models;
 
 namespace SushiRestaurant;
 
-public class Guest : Person
+// Employee no longer inherits from Person Flattening
+public class Guest
 {
+    // Person field
+    private string _firstName = default!;
+    private string _lastName  = default!;
+
+    public string FirstName
+    {
+        get => _firstName;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("First name is required.", nameof(FirstName));
+            _firstName = value.Trim();
+        }
+    }
+
+    public string LastName
+    {
+        get => _lastName;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Last name is required.", nameof(LastName));
+            _lastName = value.Trim();
+        }
+    }
+    
     private static readonly List<Guest> _extent = new();
     public static IReadOnlyList<Guest> Extent => _extent.AsReadOnly();
 
@@ -134,14 +161,18 @@ public class Guest : Person
     }
 
     public Guest(string firstName, string lastName, string? nickname = null)
-        : base(firstName, lastName)
     {
+        LastName  = lastName;
+        Nickname  = nickname;
         Nickname = nickname;
         _extent.Add(this);
     }
 
 
-    public Guest() { }
+    public Guest()
+    {
+        _extent.Add(this);
+    }
 
     public static Guest? FindByName(string firstName, string lastName)
     {

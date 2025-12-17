@@ -20,8 +20,35 @@ public enum EmploymentType
 }
 
 // employee no longer abstract
-public class Employee : Person
+// Employee no longer inherits from Person Flattening
+public class Employee
 {
+    // Person fields 
+    private string _firstName = default!;
+    private string _lastName  = default!;
+
+    public string FirstName
+    {
+        get => _firstName;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("First name is required.", nameof(FirstName));
+            _firstName = value.Trim();
+        }
+    }
+
+    public string LastName
+    {
+        get => _lastName;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Last name is required.", nameof(LastName));
+            _lastName = value.Trim();
+        }
+    }
+
     // persistence, now changed so it only stores instances of Employee
     private static readonly List<Employee> _extent = new();
     public static IReadOnlyList<Employee> Extent => _extent.AsReadOnly();
