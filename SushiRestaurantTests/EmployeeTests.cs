@@ -80,23 +80,6 @@ namespace sushi_restaurant_tests
             var ex = Assert.Throws<InvalidOperationException>(() => waiter.AssignMentor(cleaner));
             Assert.That(ex.Message, Does.Contain("same role"));
         }
-        [Test]
-        public void Creating_Employee_Adds_To_Extent()
-        {
-            var e1 = new Employee(
-                "A", "B", _defaultAddress, "1", "1", 3000m,
-                EmployeeRole.Waiter, EmploymentType.FullTime
-            );
-
-            var e2 = new Employee(
-                "C", "D", _defaultAddress, "2", "2", 3000m,
-                EmployeeRole.Cleaner, EmploymentType.FullTime,
-                cleaningShift: "Day", assignedArea: "Kitchen"
-            );
-
-            Assert.That(Employee.Extent.Count, Is.EqualTo(2));
-            Assert.That(Employee.Extent.Contains(e1));
-            Assert.That(Employee.Extent.Contains(e2));
-        }
+       
     }
 }

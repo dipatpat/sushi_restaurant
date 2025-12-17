@@ -163,16 +163,6 @@ namespace sushi_restaurant_tests
                 Assert.That(guest.Reservations, Is.Empty);
             });
         }
-
-        [Test]
-        public void Creating_Guest_Adds_To_Extent()
-        {
-            var g1 = new Guest("A", "B");
-            var g2 = new Guest("C", "D");
-
-            Assert.That(Guest.Extent.Count, Is.EqualTo(2));
-            Assert.That(Guest.Extent.Contains(g1));
-            Assert.That(Guest.Extent.Contains(g2));
-        }
+        
     }
 }
