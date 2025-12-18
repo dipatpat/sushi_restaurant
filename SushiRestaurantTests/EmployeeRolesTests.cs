@@ -84,6 +84,7 @@ namespace sushi_restaurant_tests
             Assert.Throws<InvalidOperationException>(() => cleaner.AddLanguage("English"));
         }
         
+        
         [Test]
         public void EmployeeRole_Should_Contain_Manager_And_Cook()
         {
@@ -91,7 +92,6 @@ namespace sushi_restaurant_tests
             Assert.That(Enum.IsDefined(typeof(EmployeeRole), EmployeeRole.Cook));
         }
 
-        
         
 
         // [Test]

@@ -16,6 +16,12 @@ public enum EmploymentType
     FullTime,
     PartTime
 }
+public enum SeniorityLevel
+{
+    Junior,
+    Mid,
+    Senior
+}
 
 // employee no longer abstract
 // Employee no longer inherits from Person Flattening

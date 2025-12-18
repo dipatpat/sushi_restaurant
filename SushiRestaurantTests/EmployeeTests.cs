@@ -50,7 +50,7 @@ namespace sushi_restaurant_tests
             Assert.That(emp.CleaningShift, Is.EqualTo("Night Shift"));
             Assert.Throws<InvalidOperationException>(() => { var t = emp.Tips; });
         }
-
+        
         [Test]
         public void Should_Handle_Dynamic_Type_Switch_From_PartTime_To_FullTime()
         {
